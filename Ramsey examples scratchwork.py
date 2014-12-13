@@ -85,7 +85,7 @@ def tadpole(chord1, chord2, modulus):
     evenpows = modpows(generator, modulus)
     print(evenpows)
     if evenpows.count(chord1) > 0:
-        chord2cntrd = True  'Yes, find chord1 to get contradiction for chord2
+        chord2cntrd = True  #Yes, find chord1 to get contradiction for chord2
     if evenpows.count(chord2) > 0:
         chord1cntrd = True
         
