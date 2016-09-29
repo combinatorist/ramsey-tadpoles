@@ -1,5 +1,3 @@
-#This is the branched version
-
 #This is a module from scratch to help with Ramsey numbers
 from math import sqrt
 
@@ -16,7 +14,7 @@ def modpows(generator, modulus, printlist = 'default'):
     if printlist not in('default',False,0,'No'):
         print(powers)
     return(powers)
-    
+
 def oddpows(evenpows, chord, modulus, printlist = 'default'):
     """Finds odd powers for a chord in a given mod. Enter evenpows as list"""
     oddpows = []
@@ -38,8 +36,8 @@ def bothoddpows(chord1,chord2,modulus,printlist = 'default'):
     print(oddpows1)
     oddpows1.sort()
     print(oddpows1)
-    
-    print(oddpows2)  
+
+    print(oddpows2)
     oddpows2.sort()
     print(oddpows2)
 
@@ -59,9 +57,9 @@ def coprime(x, y):
             if big % z == 0 or big % (small / z) == 0:
                 iscoprime = True
                 break
-        
+
     return(iscoprime)
-    
+
 def modinverses(values, modulus):
     """Finds the inverses in the modulus. Only takes normalized values."""
 
@@ -77,7 +75,7 @@ def tadpole(chord1, chord2, modulus):
 #Shouldn't I build something in to check that neither graph is a pan graph????
     generator = chord1 * chord2
     cntrd, chord1cntrd, chord2cntrd = False, False, False
-    
+
     if coprime(generator, modulus):
         note = 'chord product is not relatively prime to p'
         return(cntrd, chord1cntrd, chord2cntrd, note)
@@ -88,7 +86,7 @@ def tadpole(chord1, chord2, modulus):
         chord2cntrd = True  #Yes, find chord1 to get contradiction for chord2
     if evenpows.count(chord2) > 0:
         chord1cntrd = True
-        
+
     overlapcntrds = [chord1cntrd, chord2cntrd].count(True)
     if overlapcntrds == 2:
         cntrd = True
@@ -117,8 +115,8 @@ def tadpole(chord1, chord2, modulus):
     cntrd = chord1cntrd and chord2cntrd
 
     return(cntrd, chord1cntrd, chord2cntrd, note1 + note2)
-    
-        
+
+
 '''outline
 0. should output the format:
         cntrd, chord1cntrd, chord2cntrd, note
@@ -133,4 +131,3 @@ def tadpole(chord1, chord2, modulus):
 '''
 
 #Optimize the contradiction finder and make a verbose explanation function.
-    

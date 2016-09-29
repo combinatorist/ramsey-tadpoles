@@ -4,10 +4,10 @@ Created on Sat Dec 13 08:12:08 2014
 
 @author: tperish
 """
-import coprime
-import modpows
-import oddpows
-import modinverses
+from coprime import coprime
+from modpows import modpows
+from oddpows import oddpows
+from modinverses import modinverses
 
 def tpol_prf(chord1, chord2, modulus):
     """Find the first tadpole Ramsey number contradiction. Based on m-1, n-1"""
@@ -15,7 +15,7 @@ def tpol_prf(chord1, chord2, modulus):
 #Shouldn't I build something in to check that neither graph is a pan graph????
     generator = chord1 * chord2
     cntrd, chord1cntrd, chord2cntrd = False, False, False
-    
+
     if coprime(generator, modulus):
         note = 'chord product is not relatively prime to p'
         return(cntrd, chord1cntrd, chord2cntrd, note)
@@ -26,7 +26,7 @@ def tpol_prf(chord1, chord2, modulus):
         chord2cntrd = True  #Yes, find chord1 to get contradiction for chord2
     if evenpows.count(chord2) > 0:
         chord1cntrd = True
-        
+
     overlapcntrds = [chord1cntrd, chord2cntrd].count(True)
     if overlapcntrds == 2:
         cntrd = True
@@ -55,8 +55,8 @@ def tpol_prf(chord1, chord2, modulus):
     cntrd = chord1cntrd and chord2cntrd
 
     return(cntrd, chord1cntrd, chord2cntrd, note1 + note2)
-    
-        
+
+
 '''outline
 0. should output the format:
         cntrd, chord1cntrd, chord2cntrd, note

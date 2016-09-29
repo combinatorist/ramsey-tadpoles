@@ -4,8 +4,8 @@ Created on Sat Dec 13 08:06:55 2014
 
 @author: tperish
 """
-import modpows
-import oddpows
+from modpows import modpows
+from oddpows import oddpows
 
 def bothoddpows(chord1,chord2,modulus,printlist = 'default'):
     """print both sets of odd powers"""
@@ -17,8 +17,8 @@ def bothoddpows(chord1,chord2,modulus,printlist = 'default'):
     print(oddpows1)
     oddpows1.sort()
     print(oddpows1)
-    
-    print(oddpows2)  
+
+    print(oddpows2)
     oddpows2.sort()
     print(oddpows2)
 
