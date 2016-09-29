@@ -38,13 +38,13 @@ def tpol_prf(chord1, chord2, modulus):
     evenchords = evenpows + eveninverses
     if not chord1cntrd:
         print('chord1 odd powers')
-        odd1pows = oddpows(evenpows,chord1,modulus,printlist = True)
+        odd1pows = oddpows(evenpows, chord1, modulus, printlist=True)
         for pow in odd1pows:
             if evenchords.count(pow) > 0:
                 chord1cntrd = True
     if not chord2cntrd:
         print('chord2 odd powers')
-        odd2pows = oddpows(evenpows,chord2,modulus,printlist = True)
+        odd2pows = oddpows(evenpows, chord2, modulus, printlist=True)
         for pow in odd2pows:
             if evenchords.count(pow) > 0:
                 chord2cntrd = True
