@@ -7,11 +7,11 @@ Created on Sat Dec 13 08:06:21 2014
 
 def oddpows(evenpows, chord, modulus, printlist='default'):
     """Finds odd powers for a chord in a given mod. Enter evenpows as list"""
-    oddpows = []
+    oddpowers = []
     for evenpow in evenpows:
-        oddpows.append(evenpow * chord % modulus)
+        oddpowers.append(evenpow * chord % modulus)
 
-    if printlist in('default', True, 1,'yes'):
-        print(oddpows)
+    if printlist in('default', True, 1, 'yes'):
+        print(oddpowers)
 
-    return(oddpows)
+    return oddpowers

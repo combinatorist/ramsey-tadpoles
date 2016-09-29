@@ -12,4 +12,4 @@ def modinverses(values, modulus):
     for value in values:
         inverses.append(modulus - value)    #use value between 0 and modulus
 
-    return(inverses)
+    return inverses

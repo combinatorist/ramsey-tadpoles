@@ -7,12 +7,12 @@ Created on Sat Dec 13 08:06:55 2014
 from modpows import modpows
 from oddpows import oddpows
 
-def bothoddpows(chord1, chord2, modulus, $1='default'):
+def bothoddpows(chord1, chord2, modulus, printlist='default'):
     """print both sets of odd powers"""
 
     evenpows = modpows(chord1 * chord2, modulus)
-    oddpows1 = oddpows(evenpows, chord1, modulus, $1=False)
-    oddpows2 = oddpows(evenpows, chord2, modulus, $1=False)
+    oddpows1 = oddpows(evenpows, chord1, modulus, printlist=printlist)
+    oddpows2 = oddpows(evenpows, chord2, modulus, printlist=printlist)
 
     print(oddpows1)
     oddpows1.sort()

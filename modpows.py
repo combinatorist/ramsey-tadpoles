@@ -10,11 +10,11 @@ def modpows(generator, modulus, printlist='default'):
     powers = []
     current = 1
 
-    for x in range(modulus):
+    for _ in range(modulus):
         current = generator * current % modulus
         powers.append(current)
         if current == 1:
             break
     if printlist not in('default', False, 0, 'No'):
         print(powers)
-    return(powers)
+    return powers

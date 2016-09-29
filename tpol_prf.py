@@ -4,6 +4,22 @@ Created on Sat Dec 13 08:12:08 2014
 
 @author: tperish
 """
+
+# outline
+# 0. should output the format:
+#         cntrd, chord1cntrd, chord2cntrd, note
+# 1. check that both chords (i.e., their product) is relatively prime to p.
+# 2. generate the even powers, watching for the chords to show up.
+# 3. if either chord shows up, mark other chord found (by overlap contradiction)
+# 4. if both chords were found, return overlap contradiction
+# 5. now run odd powers for every chord not found.
+# 6. if chord generates an even power or its inverse, mark it found, undirected
+# 7. if both chords are found, mark complete
+# 8. return contradictions found
+
+# todo:
+# * Optimize the contradiction finder and make a verbose explanation function.
+
 from coprime import coprime
 from modpows import modpows
 from oddpows import oddpows
@@ -18,7 +34,7 @@ def tpol_prf(chord1, chord2, modulus):
 
     if coprime(generator, modulus):
         note = 'chord product is not relatively prime to p'
-        return(cntrd, chord1cntrd, chord2cntrd, note)
+        return cntrd, chord1cntrd, chord2cntrd, note
 
     evenpows = modpows(generator, modulus)
     print(evenpows)
@@ -31,7 +47,7 @@ def tpol_prf(chord1, chord2, modulus):
     if overlapcntrds == 2:
         cntrd = True
         note = 'overlap contradiction'
-        return(cntrd, chord1cntrd, chord2cntrd, note)
+        return cntrd, chord1cntrd, chord2cntrd, note
 
     eveninverses = modinverses(evenpows, modulus)
     print(eveninverses)
@@ -39,14 +55,14 @@ def tpol_prf(chord1, chord2, modulus):
     if not chord1cntrd:
         print('chord1 odd powers')
         odd1pows = oddpows(evenpows, chord1, modulus, printlist=True)
-        for pow in odd1pows:
-            if evenchords.count(pow) > 0:
+        for power in odd1pows:
+            if evenchords.count(power) > 0:
                 chord1cntrd = True
     if not chord2cntrd:
         print('chord2 odd powers')
         odd2pows = oddpows(evenpows, chord2, modulus, printlist=True)
-        for pow in odd2pows:
-            if evenchords.count(pow) > 0:
+        for power in odd2pows:
+            if evenchords.count(power) > 0:
                 chord2cntrd = True
 
     undredgcntrds = [chord1cntrd, chord2cntrd].count(True) - overlapcntrds
@@ -54,20 +70,4 @@ def tpol_prf(chord1, chord2, modulus):
     note2 = str(undredgcntrds) + ' undirected edge contradict\'s'
     cntrd = chord1cntrd and chord2cntrd
 
-    return(cntrd, chord1cntrd, chord2cntrd, note1 + note2)
-
-
-'''outline
-0. should output the format:
-        cntrd, chord1cntrd, chord2cntrd, note
-1. check that both chords (i.e., their product) is relatively prime to p.
-2. generate the even powers, watching for the chords to show up.
-3. if either chord shows up, mark other chord as found in overlap contradiction
-4. if both chords were found, return overlap contradiction
-5. now run odd powers for every chord not found.
-6. if chord generates an even power or its inverse, mark it found, undirected
-7. if both chords are found, mark complete
-8. return contradictions found
-'''
-
-#Optimize the contradiction finder and make a verbose explanation function.
+    return cntrd, chord1cntrd, chord2cntrd, note1 + note2
