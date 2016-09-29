@@ -15,6 +15,6 @@ def modpows(generator, modulus, printlist='default'):
         powers.append(current)
         if current == 1:
             break
-    if printlist not in('default', False, 0,'No'):
+    if printlist not in('default', False, 0, 'No'):
         print(powers)
     return(powers)
