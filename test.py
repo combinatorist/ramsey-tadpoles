@@ -1,5 +1,4 @@
 import unittest
-import pdb
 
 import ramsey_tadpoles as tp
 
@@ -31,5 +30,4 @@ class RamseyTadpolesTest(unittest.TestCase):
         self.assertEqual(tp.proof(2, 2, 9)[:3], (True,) * 3)
 
 if __name__ == '__main__':
-        pdb.set_trace()
         unittest.main()
