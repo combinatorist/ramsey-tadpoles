@@ -37,10 +37,9 @@ def tpol_prf(chord1, chord2, modulus):
         return cntrd, chord1cntrd, chord2cntrd, note
 
     evenpows = modpows(generator, modulus)
-    if evenpows.count(chord1) > 0:
-        chord2cntrd = True  #Yes, find chord1 to get contradiction for chord2
-    if evenpows.count(chord2) > 0:
-        chord1cntrd = True
+    # Find chord1 in evenpows to get contradiction for chord2 and vice versa
+    chord2cntrd = evenpows.count(chord1) > 0
+    chord1cntrd = evenpows.count(chord2) > 0
 
     overlapcntrds = [chord1cntrd, chord2cntrd].count(True)
     if overlapcntrds == 2:
