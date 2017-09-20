@@ -1,9 +1,9 @@
 import unittest
 import pdb
 
-import tpol_prf as tp
+import ramsey_tadpoles as tp
 
-tp.tpol_prf(5, 6, 31)
+tp.proof(5, 6, 31)
 
 
 class RamseyTadpolesTest(unittest.TestCase):
@@ -26,9 +26,9 @@ class RamseyTadpolesTest(unittest.TestCase):
     def test040_modinverses(self):
         self.assertEqual(tp.modinverses([30, 18, 1], 49), [19, 31, 48])
 
-    def test050_tpol_prf(self):
-        self.assertEqual(tp.tpol_prf(3, 10, 49)[:3], (False,) * 3)
-        self.assertEqual(tp.tpol_prf(2, 2, 9)[:3], (True,) * 3)
+    def test050_proof(self):
+        self.assertEqual(tp.proof(3, 10, 49)[:3], (False,) * 3)
+        self.assertEqual(tp.proof(2, 2, 9)[:3], (True,) * 3)
 
 if __name__ == '__main__':
         pdb.set_trace()

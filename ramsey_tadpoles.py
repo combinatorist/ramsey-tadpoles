@@ -22,7 +22,7 @@ Created on Sat Dec 13 08:12:08 2014
 
 from math import sqrt
 
-def tpol_prf(chord1, chord2, modulus):
+def proof(chord1, chord2, modulus):
     """Find the first tadpole Ramsey number contradiction. Based on m-1, n-1"""
 
 #Shouldn't I build something in to check that neither graph is a pan graph????
