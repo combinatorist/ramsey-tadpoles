@@ -23,6 +23,9 @@ class RamseyTadpolesTest(unittest.TestCase):
     def test030_oddpows(self):
         self.assertEqual(tp.oddpows([30, 18, 1], 10, 49), [6, 33, 10])
 
+    def test040_modinverses(self):
+        self.assertEqual(tp.modinverses([30, 18, 1], 49), [19, 31, 48])
+
 if __name__ == '__main__':
         pdb.set_trace()
         unittest.main()
