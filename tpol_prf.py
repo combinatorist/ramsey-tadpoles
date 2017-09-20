@@ -20,10 +20,7 @@ Created on Sat Dec 13 08:12:08 2014
 # todo:
 # * Optimize the contradiction finder and make a verbose explanation function.
 
-from coprime import coprime
-from modpows import modpows
-from oddpows import oddpows
-from modinverses import modinverses
+from math import sqrt
 
 def tpol_prf(chord1, chord2, modulus):
     """Find the first tadpole Ramsey number contradiction. Based on m-1, n-1"""
@@ -66,3 +63,44 @@ def tpol_prf(chord1, chord2, modulus):
     cntrd = chord1cntrd and chord2cntrd
 
     return cntrd, chord1cntrd, chord2cntrd, note1 + note2
+
+
+def coprime(x, y):
+    """checks that two integers are relatively prime"""
+
+    small, big = min(x, y), max(x, y)
+    iscoprime = True
+    if big % small == 0:
+        iscoprime = False
+    else:
+        for z in range(2, int(sqrt(small)) + 1):
+            if small % z == 0:
+                if big % z == 0 or big % (small / z) == 0:
+                    iscoprime = False
+                    break
+
+    return iscoprime
+
+
+def modpows(generator, modulus):
+    """"Finds all powers of a generator in a given mod"""
+    powers = []
+    current = 1
+
+    for _ in range(modulus):
+        current = generator * current % modulus
+        powers.append(current)
+        if current in (1, 0):
+            break
+
+    return powers
+
+
+def oddpows(evenpows, chord, modulus):
+    """Finds odd powers for a chord in a given mod. Enter evenpows as list"""
+    return [evenpow * chord % modulus for evenpow in evenpows]
+
+
+def modinverses(values, modulus):
+    """Finds the inverses in the modulus. Only takes normalized values."""
+    return [modulus - value for value in values]
