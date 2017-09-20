@@ -2,13 +2,13 @@
 """
 Created on Sat Dec 13 08:12:08 2014
 
-@author: tperish
+@author: combinatorist
 """
 
 # outline
 # 0. should output the format:
 #         cntrd, chord1cntrd, chord2cntrd, note
-# 1. check that both chords (i.e., their product) is relatively prime to p.
+# 1. check that both chords (i.e., their product) are relatively prime to p.
 # 2. generate the even powers, watching for the chords to show up.
 # 3. if either chord shows up, mark other chord found (by overlap contradiction)
 # 4. if both chords were found, return overlap contradiction
@@ -25,7 +25,7 @@ from math import sqrt
 def proof(chord1, chord2, modulus):
     """Find the first tadpole Ramsey number contradiction. Based on m-1, n-1"""
 
-#Shouldn't I build something in to check that neither graph is a pan graph????
+    #NB: Should I check that neither graph is a pan graph????
     generator = chord1 * chord2
     cntrd, chord1cntrd, chord2cntrd = False, False, False
 
