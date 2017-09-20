@@ -32,7 +32,7 @@ def tpol_prf(chord1, chord2, modulus):
     generator = chord1 * chord2
     cntrd, chord1cntrd, chord2cntrd = False, False, False
 
-    if coprime(generator, modulus):
+    if not coprime(generator, modulus):
         note = 'chord product is not relatively prime to p'
         return cntrd, chord1cntrd, chord2cntrd, note
 
