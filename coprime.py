@@ -15,7 +15,6 @@ def coprime(x, y):
         iscoprime = False
     else:
         for z in range(2, int(sqrt(small)) + 1):
-            print(z)
             if small % z == 0:
                 if big % z == 0 or big % (small / z) == 0:
                     iscoprime = False

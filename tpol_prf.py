@@ -37,7 +37,6 @@ def tpol_prf(chord1, chord2, modulus):
         return cntrd, chord1cntrd, chord2cntrd, note
 
     evenpows = modpows(generator, modulus)
-    print(evenpows)
     if evenpows.count(chord1) > 0:
         chord2cntrd = True  #Yes, find chord1 to get contradiction for chord2
     if evenpows.count(chord2) > 0:
@@ -50,17 +49,14 @@ def tpol_prf(chord1, chord2, modulus):
         return cntrd, chord1cntrd, chord2cntrd, note
 
     eveninverses = modinverses(evenpows, modulus)
-    print(eveninverses)
     evenchords = evenpows + eveninverses
     if not chord1cntrd:
-        print('chord1 odd powers')
-        odd1pows = oddpows(evenpows, chord1, modulus, printlist=True)
+        odd1pows = oddpows(evenpows, chord1, modulus)
         for power in odd1pows:
             if evenchords.count(power) > 0:
                 chord1cntrd = True
     if not chord2cntrd:
-        print('chord2 odd powers')
-        odd2pows = oddpows(evenpows, chord2, modulus, printlist=True)
+        odd2pows = oddpows(evenpows, chord2, modulus)
         for power in odd2pows:
             if evenchords.count(power) > 0:
                 chord2cntrd = True
