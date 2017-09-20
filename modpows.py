@@ -13,7 +13,7 @@ def modpows(generator, modulus, printlist='default'):
     for _ in range(modulus):
         current = generator * current % modulus
         powers.append(current)
-        if current == 1:
+        if current in (1, 0):
             break
     if printlist not in('default', False, 0, 'No'):
         print(powers)

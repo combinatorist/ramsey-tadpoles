@@ -15,6 +15,11 @@ class RamseyTadpolesTest(unittest.TestCase):
         self.assertFalse(tp.coprime(50, 30))
         self.assertFalse(tp.coprime(3, 30))
 
+    def test020_modpows(self):
+        self.assertEqual(tp.modpows(2, 3), [2, 1])
+        self.assertEqual(tp.modpows(30, 49), [30, 18, 1])
+        self.assertEqual(tp.modpows(30, 50), [30, 0])
+
 if __name__ == '__main__':
         pdb.set_trace()
         unittest.main()
