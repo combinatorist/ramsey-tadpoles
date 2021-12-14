@@ -21,6 +21,7 @@ Created on Sat Dec 13 08:12:08 2014
 # * Optimize the contradiction finder and make a verbose explanation function.
 
 from math import sqrt
+from datetime import datetime, timedelta
 
 def proof(chord1, chord2, modulus):
     """Find the first tadpole Ramsey number contradiction. Based on m-1, n-1"""
@@ -104,3 +105,56 @@ def oddpows(evenpows, chord, modulus):
 def modinverses(values, modulus):
     """Finds the inverses in the modulus. Only takes normalized values."""
     return [modulus - value for value in values]
+
+
+class Logger:
+  def __init__(self):
+      self.last_log_time = datetime.now()
+
+  def log(self, content, check=False):
+      now = datetime.now()
+      if not check or now - self.last_log_time > timedelta(seconds = 10):
+        print("")
+        print(now.isoformat() + ": \n" + str(content))
+        self.last_log_time = now
+
+logger = Logger()
+
+def scan(scale_start=2, diff_start=0, ceil_start=2):
+    i = scale_start
+    j = diff_start
+    k = ceil_start
+    max_k = 2
+    max_k_list = []
+    max_k_ratio = 1
+    max_k_ratio_list = []
+    while True:
+      while j <= i:
+        while True:
+          J = i + j
+          K = J + k
+          res = proof(i, J, K)
+          if res[0]:
+            k_ratio = 1.0 * K / J
+            if k_ratio > max_k_ratio:
+              max_k_ratio = k_ratio
+              max_k_ratio_stats = ((i, 1.0 * J / i, J, k_ratio, K), res)
+              max_k_ratio_list += max_k_ratio_stats
+              logger.log(("new max k ratio:", max_k_ratio_stats))
+              # logger.log(modpows(i * J, K))
+            if k > max_k:
+              max_k = k
+              max_k_stats = ((i, j, J, k, K), res)
+              max_k_list += max_k_stats
+              logger.log(("new max k:", max_k_stats))
+              # logger.log(modpows(i * J, K))
+            break
+          logger.log((i, J, K), check = True)
+          k += 1
+        j += 1
+        k = 2
+      i += 1
+      j = 0
+
+if __name__ == "__main__":
+   scan()
