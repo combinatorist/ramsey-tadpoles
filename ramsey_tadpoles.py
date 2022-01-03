@@ -23,6 +23,27 @@ Created on Sat Dec 13 08:12:08 2014
 from math import sqrt
 from datetime import datetime, timedelta
 
+from collections import namedtuple
+
+ProofResult = namedtuple(
+  "ProofResult",
+  [
+    'is_coprime',
+    'is_upper_bound',
+    'has_chord1_overlap_contradiction',
+    'has_chord2_overlap_contradiction'])
+
+
+def fast_proof(chord1, chord2, modulus):
+    """Find all Diameter Ramsey number contradictions"""
+
+    #NB: Should I check that neither graph is a pan graph????
+    generator = chord1 * chord2 % modulus
+
+    is_coprime = coprime(generator, modulus)
+
+
+
 def proof(chord1, chord2, modulus):
     """Find the first tadpole Ramsey number contradiction. Based on m-1, n-1"""
 
@@ -30,38 +51,31 @@ def proof(chord1, chord2, modulus):
     generator = chord1 * chord2
     cntrd, chord1cntrd, chord2cntrd = False, False, False
 
-    if not coprime(generator, modulus):
-        note = 'chord product is not relatively prime to p'
-        return cntrd, chord1cntrd, chord2cntrd, note
+    is_coprime = coprime(generator, modulus)
+    if not is_coprime:
+        return cntrd, chord1cntrd, chord2cntrd
 
     evenpows = modpows(generator, modulus)
     # Find chord1 in evenpows to get contradiction for chord2 and vice versa
-    chord2cntrd = evenpows.count(chord1) > 0
-    chord1cntrd = evenpows.count(chord2) > 0
-
-    overlapcntrds = [chord1cntrd, chord2cntrd].count(True)
-    if overlapcntrds == 2:
-        cntrd = True
-        note = 'overlap contradiction'
-        return cntrd, chord1cntrd, chord2cntrd, note
+    has_chord2_overlap_contradiction = chord1 in evenpows
+    if chord1 != chord2:
+      has_chord1_overlap_contradiction = chord2 in evenpows
+    else:
+      has_chord1_overlap_contradiction = has_chord2_overlap_contradiction
 
     eveninverses = modinverses(evenpows, modulus)
     evenchords = evenpows + eveninverses
-    if not chord1cntrd:
-        odd1pows = oddpows(evenpows, chord1, modulus)
-        for power in odd1pows:
-            if evenchords.count(power) > 0:
-                chord1cntrd = True
-    if not chord2cntrd:
-        odd2pows = oddpows(evenpows, chord2, modulus)
-        for power in odd2pows:
-            if evenchords.count(power) > 0:
-                chord2cntrd = True
-
-    undredgcntrds = [chord1cntrd, chord2cntrd].count(True) - overlapcntrds
-    note1 = str(overlapcntrds) + ' overlap contradict\'s, '
-    note2 = str(undredgcntrds) + ' undirected edge contradict\'s'
-    cntrd = chord1cntrd and chord2cntrd
+    odd1pows = oddpows(evenpows, chord1, modulus)
+    has_chord1_inverse_contradiction = False
+    for power in odd1pows:
+        if evenchords.count(power) > 0:
+            has_chord1_inverse_contradiction = True
+            break
+    has_chord2_inverse_contradiction = False
+    for power in odd1pows:
+        if evenchords.count(power) > 0:
+            has_chord2_inverse_contradiction = True
+            break
 
     return cntrd, chord1cntrd, chord2cntrd, note1 + note2
 
@@ -100,11 +114,6 @@ def modpows(generator, modulus):
 def oddpows(evenpows, chord, modulus):
     """Finds odd powers for a chord in a given mod. Enter evenpows as list"""
     return [evenpow * chord % modulus for evenpow in evenpows]
-
-
-def modinverses(values, modulus):
-    """Finds the inverses in the modulus. Only takes normalized values."""
-    return [modulus - value for value in values]
 
 
 class Logger:
@@ -156,5 +165,7 @@ def scan(scale_start=2, diff_start=0, ceil_start=2):
       i += 1
       j = 0
 
+def counters(max=4, a=2, b=2):
+    while 
 if __name__ == "__main__":
    scan()
