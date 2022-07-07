@@ -21,6 +21,7 @@ Created on Sat Dec 13 08:12:08 2014
 # * Optimize the contradiction finder and make a verbose explanation function.
 
 from math import sqrt
+from collections import namedtuple
 
 def proof(chord1, chord2, modulus):
     """Find the first tadpole Ramsey number contradiction. Based on m-1, n-1"""
@@ -70,7 +71,9 @@ def coprime(x, y):
 
     small, big = min(x, y), max(x, y)
     iscoprime = True
-    if big % small == 0:
+    if small == 1:
+        iscoprime = True
+    elif big % small == 0:
         iscoprime = False
     else:
         for z in range(2, int(sqrt(small)) + 1):
@@ -104,3 +107,60 @@ def oddpows(evenpows, chord, modulus):
 def modinverses(values, modulus):
     """Finds the inverses in the modulus. Only takes normalized values."""
     return [modulus - value for value in values]
+
+# Results = namedtuple(
+#   'Result',
+#   [
+#     min_chord,
+#     max_chord,
+#     modulo,
+#     is_primitive_root,
+#     is_coprime,
+#     has_min_chord,
+#     has_min_inverse,
+#     has_max_chord,
+#     has_max_inverse,
+#     residues
+#   ]
+# )
+
+def scan():
+    # with open('./results.csv', 'w') as cache:
+    modulo = 3
+    while True:
+      modulo += 1
+      max_chord = modulo - 2
+      for j in range(2, max_chord + 1):
+        for k in range(j, max_chord + 1):
+          generator = (j * k) % modulo
+          residues = [1, generator]
+          residue = generator * generator % modulo
+          while residue not in residues:
+              residues.append(residue)
+              residue = residue * generator % modulo
+          is_primitive_root = len(residues) == modulo - 1
+          nontrivial_residues = [x for x in residues[1:] if x != 0]
+          is_coprime = is_primitive_root or (
+              nontrivial_residues
+                  and
+              coprime(min(nontrivial_residues), modulo)
+          )
+          has_min_chord = is_primitive_root or j in(residues)
+          has_max_chord = is_primitive_root or k in(residues)
+          has_min_inverse = is_primitive_root or (modulo - j) in(residues)
+          has_max_inverse = is_primitive_root or (modulo - k) in(residues)
+          print(",".join(str(x) for x in [
+              j,
+              k,
+              modulo,
+              1 if is_primitive_root else 0,
+              1 if is_coprime else 0,
+              1 if has_min_chord else 0,
+              1 if has_min_inverse else 0,
+              1 if has_max_chord else 0,
+              1 if has_max_inverse else 0,
+              "|".join(str(x) for x in residues)
+          ]))
+
+if __name__ == '__main__':
+    scan()
