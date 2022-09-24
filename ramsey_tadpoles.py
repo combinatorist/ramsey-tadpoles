@@ -198,6 +198,121 @@ def scan():
               "|".join(str(x) for x in brute_residues)
           ]))
 
+StartResult = namedtuple(
+    'StartResult',
+    [
+        has_started,
+        has_completed,
+        steps
+    ]
+
+ResidueBelonging = namedtuple(
+    'ResidueBelonging',
+    [
+      in_left,
+      in_right,
+      is_nontrivial
+    ]
+
+def preview_new_residues(modulo, steps, j, k, residues):
+    residues = {k: v.replace(is_nontrivial=False) for k,v in residues.items()}
+    left = get_n_length_residues(modulo, steps, j)
+    if j == k:
+       right = left
+    else:
+       right = get_n_length_residues(modulo, steps, k)
+
+    did_update = False
+    for i in left:
+        if not residues[i].in_left:
+            other = residues[i].in_right
+            residues[i] = ResidueBelonging(True, other, True)
+    for i in right:
+        if not residues[i].in_right:
+            other = residues[i].in_right
+            residues[i] = ResidueBelonging(other, True, True)
+    return {k:v for k,v in residues.items() if v.is_nontrivial}
+
+def get_n_length_residues(modulo, steps, n):
+    return set(sum(cycle(x.step for x in steps)[i:i+n]) for i in range(modulo))
+
+def new_residues_sort_key(rs):
+    groups = groupby(sorted(rs, key=(lambda x: (x.in_left, x.in_right))))
+    counts = (-len(x) for x in reverse(groups),)
+    return counts
+
+def get_brute_residues(modulo, j, k, residues=None):
+    # "Starts" optimize and prioritize minimum non-trivial subsequences
+    # ... so we don't have to check all possible (mostly redundant) sequences
+    # We mill still redundantly check one start while working on another
+    # ... but it still shouldn't be as bad as trying all possible sequences.
+    if not residues:
+        residues = get_residues(j * k, modulo)
+    if type(residues) is list:
+       residues = {k: k in residues for k in range(modulo)}
+    start_sequences = product(residues, k)
+    normalized_starts = (sorted(v, reverse(v))[0] for x in start_sequences)
+    distinct_starts = set(normalized_starts)
+    categorized_starts = (start: preview_new_residues(modulo, steps, j, k, residues) for start in distinct_starts)
+    prioritized_starts = sorted(categorized_starts, key=lambda x: new_residues_sort_key(x[2]))
+
+    for start, effect in prioritized_starts:
+        result = test_start(modulo, residues, start)
+        if result.has_completed:
+            print(result)
+            return get_brute_residues(modulo, j, k, residues | effect)
+
+def test_start(modulo, residues, start):
+    point = 0
+    points = []
+    steps = []
+    for x in start:
+       new_point += x % modulo
+       if new_point in (points + 0):
+           # start is impossible
+           return StartResult(False, False, steps)
+       else:
+           point = new_point
+           points.append(point)
+           steps.append(BruteStep(x, point))
+
+    has_started = True
+    num_residues = len(residues)
+    residue_index = 0
+    start_length = len(start)
+    length = start_length
+
+    while length < modulo:
+       if residue_index == num_residues:
+          # backtrack:
+          if length == start_length:
+              return StartResult(has_started, False, steps)
+          else:
+              length -= 1
+              steps.pop()
+              points.pop()
+
+              new_last_step = steps[-1]
+              point = new_last_step.point
+              residue_index = residues.index new_last_step.step + 1
+
+       else:
+          x = residues[residue_index]
+
+       new_point += x % modulo
+       if new_point in points:
+          # try next residue
+          residue_index += 1
+          continue
+       else:
+           point = new_point
+           points.append(point)
+           steps.append(BruteStep(x, point))
+           length += 1
+           residue_index = 0
+
+    return StartResult(has_started, True, steps)
+
 
 if __name__ == '__main__':
-    scan()
+    get_brute_residues(13, 2, 2)
