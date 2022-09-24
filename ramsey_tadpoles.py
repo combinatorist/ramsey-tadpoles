@@ -124,6 +124,14 @@ def modinverses(values, modulus):
 #   ]
 # )
 
+def get_residues(generator, modulo):
+    residues = [1, generator]
+    residue = generator * generator % modulo
+    while residue not in residues:
+        residues.append(residue)
+        residue = residue * generator % modulo
+    return residues
+
 def scan():
     # with open('./results.csv', 'w') as cache:
     modulo = 3
@@ -133,11 +141,7 @@ def scan():
       for j in range(2, max_chord + 1):
         for k in range(j, max_chord + 1):
           generator = (j * k) % modulo
-          residues = [1, generator]
-          residue = generator * generator % modulo
-          while residue not in residues:
-              residues.append(residue)
-              residue = residue * generator % modulo
+          residues = get_residues(generator, modulo)
           is_primitive_root = len(residues) == modulo - 1
           nontrivial_residues = [x for x in residues[1:] if x != 0]
           is_coprime = is_primitive_root or (
