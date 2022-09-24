@@ -132,14 +132,6 @@ def get_residues(generator, modulo):
         residue = residue * generator % modulo
     return residues
 
-BruteStep = namedtuple(
-    'BruteStep',
-    [
-      step,
-      result
-    ]
-)
-
 def scan():
     # with open('./results.csv', 'w') as cache:
     modulo = 3
@@ -161,28 +153,6 @@ def scan():
           has_max_chord = is_primitive_root or k in(residues)
           has_min_inverse = is_primitive_root or (modulo - j) in(residues)
           has_max_inverse = is_primitive_root or (modulo - k) in(residues)
-          has_min = has_min_chord or has_min_inverse
-          has_max = has_max_chord or has_max_inverse
-          has_easy_contradiction = is_coprime and has_min and has_max
-          if is_coprime and not has_easy_contradiction:
-              # The trick here is to prove I can make a modulo cycle in red
-              # ... but using diverse length red chords
-              # Then, distinct combos of lengths would count as new chord to avoid.
-              # Specifically, a sequence in red with as many steps as avoided in blue.
-              # So, instead of multiplication, it's just repeated (diverse) addition.
-              brute_residues = []
-                   chords = 
-              while 
-              has_min_chord = j in(brute_residues)
-              has_max_chord = k in(brute_residues)
-              has_min_inverse = (modulo - j) in(brute_residues)
-              has_max_inverse = (modulo - k) in(brute_residues)
-              required_brute = True
-          else:
-              brute_residues = []
-              required_brute = False
-          
-
           print(",".join(str(x) for x in [
               j,
               k,
@@ -193,9 +163,7 @@ def scan():
               1 if has_min_inverse else 0,
               1 if has_max_chord else 0,
               1 if has_max_inverse else 0,
-              1 if required_brute_residues else 0,
-              "|".join(str(x) for x in residues),
-              "|".join(str(x) for x in brute_residues)
+              "|".join(str(x) for x in residues)
           ]))
 
 StartResult = namedtuple(
@@ -312,7 +280,6 @@ def test_start(modulo, residues, start):
            residue_index = 0
 
     return StartResult(has_started, True, steps)
-
 
 if __name__ == '__main__':
     get_brute_residues(13, 2, 2)
