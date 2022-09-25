@@ -138,7 +138,7 @@ BruteStep = namedtuple(
     'BruteStep',
     [
       'step',
-      'result'
+      'point'
     ]
 )
 
@@ -207,7 +207,7 @@ def preview_new_residues(modulo, steps, j, k, residues):
             residues[i] = ResidueBelonging(True, other, True)
     for i in right:
         if not residues[i].in_right:
-            other = residues[i].in_right
+            other = residues[i].in_left
             residues[i] = ResidueBelonging(other, True, True)
     return {k:v for k,v in residues.items() if v.is_nontrivial}
 
@@ -229,6 +229,9 @@ def new_residues_sort_key(rs):
     counts = [-len(x) for x in reversed([x for x in groups])]
     return counts
 
+def get_proper_residues(residues):
+    return sorted([k for k, v in residues.items() if v.in_left and v.in_right])
+
 def get_brute_residues(modulo, j, k, residues=None):
     # "Starts" optimize and prioritize minimum non-trivial subsequences
     # ... so we don't have to check all possible (mostly redundant) sequences
@@ -239,10 +242,12 @@ def get_brute_residues(modulo, j, k, residues=None):
     if type(residues) is list:
         residues = {k: k in residues for k in range(modulo)}
         residues = {k: ResidueBelonging(v, v, False) for k,v in residues.items()}
+    proper_residues = get_proper_residues(residues)
 
+    pprint(proper_residues)
     iterate = True
     while iterate:
-        start_sequences = product(residues, repeat=k)
+        start_sequences = product(proper_residues, repeat=k)
         normalized_starts = (sorted([v[::1], v[::1]])[0] for v in start_sequences)
         distinct_starts = set(normalized_starts)
         categorized_starts = {start: preview_new_residues(modulo, (BruteStep(x, 0) for x in start), j, k, residues) for start in distinct_starts}
@@ -264,14 +269,14 @@ def get_brute_residues(modulo, j, k, residues=None):
     return residues
 
 def test_start(modulo, residues, start):
-    residues = sorted(residues.keys())
+    proper_residues = get_proper_residues(residues)
     point = 0
-    points = []
+    points = [0]
     steps = []
     for x in start:
        point += x
        point %= modulo
-       if point in (points + [0]):
+       if point in points:
            # start is impossible
            return StartResult(False, False, steps)
        else:
@@ -279,7 +284,7 @@ def test_start(modulo, residues, start):
            steps.append(BruteStep(x, point))
 
     has_started = True
-    num_residues = len(residues)
+    num_residues = len(proper_residues)
     residue_index = 0
     start_length = len(start)
     length = start_length
@@ -296,22 +301,23 @@ def test_start(modulo, residues, start):
 
               new_last_step = steps[-1]
               point = new_last_step.point
-              residue_index = residues.index(new_last_step.step) + 1
+              residue_index = proper_residues.index(new_last_step.step) + 1
 
        else:
-          x = residues[residue_index]
+          x = proper_residues[residue_index]
 
        new_point = (point + x) % modulo
-       if new_point in points:
-          # try next residue
-          residue_index += 1
-          continue
-       else:
+       if new_point not in points or (new_point == 0 and length == modulo - 1):
+           # add point to structure
            point = new_point
            points.append(point)
            steps.append(BruteStep(x, point))
            length += 1
            residue_index = 0
+       else:
+           # try next residue
+           residue_index += 1
+           continue
 
     return StartResult(has_started, True, steps)
 
