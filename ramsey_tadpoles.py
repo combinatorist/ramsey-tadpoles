@@ -23,6 +23,7 @@ Created on Sat Dec 13 08:12:08 2014
 from math import sqrt
 from collections import namedtuple
 from itertools import product, groupby
+from pprint import pprint
 
 def proof(chord1, chord2, modulus):
     """Find the first tadpole Ramsey number contradiction. Based on m-1, n-1"""
@@ -221,7 +222,10 @@ def get_n_length_residues(modulo, steps, n):
         return set(sum(steps[i:i+n]) % modulo for i in range(num_steps - n + 1))
 
 def new_residues_sort_key(rs):
-    groups = groupby(sorted(rs.items(), key=(lambda x: (x[1].in_left, x[1].in_right))))
+    def newness(r):
+        return (r[1].in_left, r[1].in_right)
+    filtered = [r for r in rs.items() if newness(r) != (False, False)]
+    groups = groupby(sorted(filtered, key=(newness)), key=(newness))
     counts = [-len(x) for x in reversed([x for x in groups])]
     return counts
 
@@ -236,21 +240,28 @@ def get_brute_residues(modulo, j, k, residues=None):
         residues = {k: k in residues for k in range(modulo)}
         residues = {k: ResidueBelonging(v, v, False) for k,v in residues.items()}
 
-    while True:
+    iterate = True
+    while iterate:
         start_sequences = product(residues, repeat=k)
         normalized_starts = (sorted([v[::1], v[::1]])[0] for v in start_sequences)
         distinct_starts = set(normalized_starts)
         categorized_starts = {start: preview_new_residues(modulo, (BruteStep(x, 0) for x in start), j, k, residues) for start in distinct_starts}
-        prioritized_starts = sorted(categorized_starts.items(), key=lambda x: new_residues_sort_key(x[1]))
+        promising_starts = {k: v for k,v in categorized_starts.items() if sum(new_residues_sort_key(v))}
+        prioritized_starts = sorted(promising_starts.items(), key=lambda x: new_residues_sort_key(x[1]))
 
+        iterate = False
         for start, effect in prioritized_starts:
             result = test_start(modulo, residues, start)
             if result.has_completed:
-                print(result)
                 full_effect = preview_new_residues(modulo, result.steps, j, k, residues)
+                pprint(start)
+                pprint(full_effect)
+                pprint(result.steps)
                 residues = {**residues, **full_effect}
+                iterate = True
+                break
 
-        return residues
+    return residues
 
 def test_start(modulo, residues, start):
     residues = sorted(residues.keys())
@@ -258,7 +269,8 @@ def test_start(modulo, residues, start):
     points = []
     steps = []
     for x in start:
-       point += x % modulo
+       point += x
+       point %= modulo
        if point in (points + [0]):
            # start is impossible
            return StartResult(False, False, steps)
@@ -289,7 +301,7 @@ def test_start(modulo, residues, start):
        else:
           x = residues[residue_index]
 
-       new_point = x % modulo
+       new_point = (point + x) % modulo
        if new_point in points:
           # try next residue
           residue_index += 1
