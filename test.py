@@ -29,5 +29,12 @@ class RamseyTadpolesTest(unittest.TestCase):
         self.assertEqual(tp.proof(3, 10, 49)[:3], (False,) * 3)
         self.assertEqual(tp.proof(2, 2, 9)[:3], (True,) * 3)
 
+    def test060_get_n_length_residues(self):
+        steps = [tp.BruteStep(x,y) for x,y in [
+          (4,4), (3,7), (3,10), (4,1), (4,5), (4,2), (5,7), (3,10), (6,3), (4,7), (6,0), (5,5), (7,12)]]
+        self.assertEqual(tp.get_n_length_residues(13, steps[:2], 2), set([7]))
+        self.assertEqual(tp.get_n_length_residues(13, steps[:3], 2), set([7,6]))
+        self.assertEqual(tp.get_n_length_residues(13, steps, 2), set([7,6,8,9,10,11,12]))
+
 if __name__ == '__main__':
         unittest.main()

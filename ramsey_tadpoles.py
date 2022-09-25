@@ -22,6 +22,7 @@ Created on Sat Dec 13 08:12:08 2014
 
 from math import sqrt
 from collections import namedtuple
+from itertools import product, groupby
 
 def proof(chord1, chord2, modulus):
     """Find the first tadpole Ramsey number contradiction. Based on m-1, n-1"""
@@ -132,6 +133,14 @@ def get_residues(generator, modulo):
         residue = residue * generator % modulo
     return residues
 
+BruteStep = namedtuple(
+    'BruteStep',
+    [
+      'step',
+      'result'
+    ]
+)
+
 def scan():
     # with open('./results.csv', 'w') as cache:
     modulo = 3
@@ -166,24 +175,24 @@ def scan():
               "|".join(str(x) for x in residues)
           ]))
 
-StartResult = namedtuple(
-    'StartResult',
+StartResult = namedtuple('StartResult',
     [
-        has_started,
-        has_completed,
-        steps
+       'has_started',
+       'has_completed',
+       'steps'
     ]
+)
 
-ResidueBelonging = namedtuple(
-    'ResidueBelonging',
+ResidueBelonging = namedtuple('ResidueBelonging',
     [
-      in_left,
-      in_right,
-      is_nontrivial
+      'in_left',
+      'in_right',
+      'is_nontrivial'
     ]
+)
 
 def preview_new_residues(modulo, steps, j, k, residues):
-    residues = {k: v.replace(is_nontrivial=False) for k,v in residues.items()}
+    residues = {k: v._replace(is_nontrivial=False) for k,v in residues.items()}
     left = get_n_length_residues(modulo, steps, j)
     if j == k:
        right = left
@@ -202,11 +211,18 @@ def preview_new_residues(modulo, steps, j, k, residues):
     return {k:v for k,v in residues.items() if v.is_nontrivial}
 
 def get_n_length_residues(modulo, steps, n):
-    return set(sum(cycle(x.step for x in steps)[i:i+n]) for i in range(modulo))
+    steps = [x.step for x in steps]
+    num_steps = len(steps)
+    if num_steps == modulo:
+        simulated_cycle = steps + steps
+        assert(n + num_steps < 2 * modulo)
+        return set(sum(simulated_cycle[i:i+n]) % modulo for i in range(num_steps))
+    else:
+        return set(sum(steps[i:i+n]) % modulo for i in range(num_steps - n + 1))
 
 def new_residues_sort_key(rs):
-    groups = groupby(sorted(rs, key=(lambda x: (x.in_left, x.in_right))))
-    counts = (-len(x) for x in reverse(groups),)
+    groups = groupby(sorted(rs.items(), key=(lambda x: (x[1].in_left, x[1].in_right))))
+    counts = [-len(x) for x in reversed([x for x in groups])]
     return counts
 
 def get_brute_residues(modulo, j, k, residues=None):
@@ -218,29 +234,31 @@ def get_brute_residues(modulo, j, k, residues=None):
         residues = get_residues(j * k, modulo)
     if type(residues) is list:
        residues = {k: k in residues for k in range(modulo)}
-    start_sequences = product(residues, k)
-    normalized_starts = (sorted(v, reverse(v))[0] for x in start_sequences)
+       residues = {k: ResidueBelonging(v, v, False) for k,v in residues.items()}
+    start_sequences = product(residues, repeat=k)
+    normalized_starts = (sorted([v[::1], v[::1]])[0] for v in start_sequences)
     distinct_starts = set(normalized_starts)
-    categorized_starts = (start: preview_new_residues(modulo, steps, j, k, residues) for start in distinct_starts)
-    prioritized_starts = sorted(categorized_starts, key=lambda x: new_residues_sort_key(x[2]))
+    categorized_starts = {start: preview_new_residues(modulo, (BruteStep(x, 0) for x in start), j, k, residues) for start in distinct_starts}
+    prioritized_starts = sorted(categorized_starts.items(), key=lambda x: new_residues_sort_key(x[1]))
 
     for start, effect in prioritized_starts:
         result = test_start(modulo, residues, start)
         if result.has_completed:
             print(result)
-            return get_brute_residues(modulo, j, k, residues | effect)
+            full_effect = preview_new_residues(modulo, result.steps, j, k, residues)
+            return get_brute_residues(modulo, j, k, {**residues, **effect})
 
 def test_start(modulo, residues, start):
+    residues = sorted(residues.keys())
     point = 0
     points = []
     steps = []
     for x in start:
-       new_point += x % modulo
-       if new_point in (points + 0):
+       point += x % modulo
+       if point in (points + [0]):
            # start is impossible
            return StartResult(False, False, steps)
        else:
-           point = new_point
            points.append(point)
            steps.append(BruteStep(x, point))
 
@@ -262,12 +280,12 @@ def test_start(modulo, residues, start):
 
               new_last_step = steps[-1]
               point = new_last_step.point
-              residue_index = residues.index new_last_step.step + 1
+              residue_index = residues.index(new_last_step.step) + 1
 
        else:
           x = residues[residue_index]
 
-       new_point += x % modulo
+       new_point = x % modulo
        if new_point in points:
           # try next residue
           residue_index += 1
