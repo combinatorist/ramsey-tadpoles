@@ -233,20 +233,24 @@ def get_brute_residues(modulo, j, k, residues=None):
     if not residues:
         residues = get_residues(j * k, modulo)
     if type(residues) is list:
-       residues = {k: k in residues for k in range(modulo)}
-       residues = {k: ResidueBelonging(v, v, False) for k,v in residues.items()}
-    start_sequences = product(residues, repeat=k)
-    normalized_starts = (sorted([v[::1], v[::1]])[0] for v in start_sequences)
-    distinct_starts = set(normalized_starts)
-    categorized_starts = {start: preview_new_residues(modulo, (BruteStep(x, 0) for x in start), j, k, residues) for start in distinct_starts}
-    prioritized_starts = sorted(categorized_starts.items(), key=lambda x: new_residues_sort_key(x[1]))
+        residues = {k: k in residues for k in range(modulo)}
+        residues = {k: ResidueBelonging(v, v, False) for k,v in residues.items()}
 
-    for start, effect in prioritized_starts:
-        result = test_start(modulo, residues, start)
-        if result.has_completed:
-            print(result)
-            full_effect = preview_new_residues(modulo, result.steps, j, k, residues)
-            return get_brute_residues(modulo, j, k, {**residues, **effect})
+    while True:
+        start_sequences = product(residues, repeat=k)
+        normalized_starts = (sorted([v[::1], v[::1]])[0] for v in start_sequences)
+        distinct_starts = set(normalized_starts)
+        categorized_starts = {start: preview_new_residues(modulo, (BruteStep(x, 0) for x in start), j, k, residues) for start in distinct_starts}
+        prioritized_starts = sorted(categorized_starts.items(), key=lambda x: new_residues_sort_key(x[1]))
+
+        for start, effect in prioritized_starts:
+            result = test_start(modulo, residues, start)
+            if result.has_completed:
+                print(result)
+                full_effect = preview_new_residues(modulo, result.steps, j, k, residues)
+                residues = {**residues, **full_effect}
+
+        return residues
 
 def test_start(modulo, residues, start):
     residues = sorted(residues.keys())
