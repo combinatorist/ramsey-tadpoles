@@ -186,29 +186,18 @@ StartResult = namedtuple('StartResult',
 
 ResidueBelonging = namedtuple('ResidueBelonging',
     [
-      'in_left',
-      'in_right',
+      'in_both',
       'is_nontrivial'
     ]
 )
 
-def preview_new_residues(modulo, steps, j, k, residues):
+def preview_new_residues(modulo, steps, generator, residues):
     residues = {k: v._replace(is_nontrivial=False) for k,v in residues.items()}
-    left = get_n_length_residues(modulo, steps, j)
-    if j == k:
-       right = left
-    else:
-       right = get_n_length_residues(modulo, steps, k)
+    new_residues = get_n_length_residues(modulo, steps, generator)
 
-    did_update = False
-    for i in left:
-        if not residues[i].in_left:
-            other = residues[i].in_right
-            residues[i] = ResidueBelonging(True, other, True)
-    for i in right:
-        if not residues[i].in_right:
-            other = residues[i].in_left
-            residues[i] = ResidueBelonging(other, True, True)
+    for i in new_residues:
+        if not residues[i].in_both:
+            residues[i] = ResidueBelonging(True, True)
     return {k:v for k,v in residues.items() if v.is_nontrivial}
 
 def get_n_length_residues(modulo, steps, n):
@@ -221,38 +210,33 @@ def get_n_length_residues(modulo, steps, n):
     else:
         return set(sum(steps[i:i+n]) % modulo for i in range(num_steps - n + 1))
 
-def new_residues_sort_key(rs):
-    def newness(r):
-        return (r[1].in_left, r[1].in_right)
-    filtered = [r for r in rs.items() if newness(r) != (False, False)]
-    groups = groupby(sorted(filtered, key=(newness)), key=(newness))
-    counts = [-len(x) for x in reversed([x for x in groups])]
-    return counts
-
 def get_proper_residues(residues):
-    return sorted([k for k, v in residues.items() if v.in_left and v.in_right])
+    return sorted([k for k, v in residues.items() if v.in_both])
 
-def get_brute_residues(modulo, j, k, residues=None):
+def get_brute_residues(modulo, generator, residues=None):
     # "Starts" optimize and prioritize minimum non-trivial subsequences
     # ... so we don't have to check all possible (mostly redundant) sequences
     # We mill still redundantly check one start while working on another
     # ... but it still shouldn't be as bad as trying all possible sequences.
     if not residues:
-        residues = get_residues(j * k, modulo)
+        residues = get_residues(generator, modulo)
     if type(residues) is list:
         residues = {k: k in residues for k in range(modulo)}
-        residues = {k: ResidueBelonging(v, v, False) for k,v in residues.items()}
+        residues = {k: ResidueBelonging(v, False) for k,v in residues.items()}
     proper_residues = get_proper_residues(residues)
+
+    def count_residues(rs):
+        return len([r for r in rs.items() if r[1].in_both])
 
     pprint(proper_residues)
     iterate = True
     while iterate:
-        start_sequences = product(proper_residues, repeat=k)
+        start_sequences = product(proper_residues, repeat=generator)
         normalized_starts = (sorted([v[::1], v[::1]])[0] for v in start_sequences)
         distinct_starts = set(normalized_starts)
-        categorized_starts = {start: preview_new_residues(modulo, (BruteStep(x, 0) for x in start), j, k, residues) for start in distinct_starts}
-        promising_starts = {k: v for k,v in categorized_starts.items() if sum(new_residues_sort_key(v))}
-        prioritized_starts = sorted(promising_starts.items(), key=lambda x: new_residues_sort_key(x[1]))
+        categorized_starts = {start: preview_new_residues(modulo, (BruteStep(x, 0) for x in start), generator, residues) for start in distinct_starts}
+        promising_starts = {k: v for k,v in categorized_starts.items() if count_residues(v)}
+        prioritized_starts = sorted(promising_starts.items(), key=lambda x: -count_residues(x[1]))
 
         pprint('retrying with additional residues')
         iterate = False
@@ -260,11 +244,11 @@ def get_brute_residues(modulo, j, k, residues=None):
             pprint(start)
             result = test_start(modulo, residues, start)
             if result.has_completed:
-                full_effect = preview_new_residues(modulo, result.steps, j, k, residues)
+                full_effect = preview_new_residues(modulo, result.steps, generator, residues)
                 pprint(full_effect)
                 pprint(result.steps)
                 residues = {**residues, **full_effect}
-                iterate = True
+                iterate = len([x for x in get_proper_residues(residues) if x != 0]) < modulo - 1
                 break
 
     return residues
@@ -294,19 +278,17 @@ def test_start(modulo, residues, start):
     while length < modulo:
        if residue_index == num_residues:
           # backtrack:
-          pprint('backtracking from:')
-          pprint(steps)
+          #pprint('backtracking from:')
+          #pprint(steps)
           if length <= start_length:
               return StartResult(has_started, False, steps)
           else:
               # backtrack
-              steps.reverse()
               step = steps.pop()
               while step.step == max_residue:
                  step = steps.pop()
-              steps.reverse()
               length = len(steps)
-              points = [step.point for step in steps]
+              points = [0] + [step.point for step in steps]
 
               point = points[-1]
               residue_index = proper_residues.index(step.step) + 1
@@ -330,4 +312,4 @@ def test_start(modulo, residues, start):
     return StartResult(has_started, True, steps)
 
 if __name__ == '__main__':
-    get_brute_residues(13, 2, 2)
+    pprint(get_brute_residues(13, 4))
