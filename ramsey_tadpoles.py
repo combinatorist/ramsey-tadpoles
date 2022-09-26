@@ -254,12 +254,13 @@ def get_brute_residues(modulo, j, k, residues=None):
         promising_starts = {k: v for k,v in categorized_starts.items() if sum(new_residues_sort_key(v))}
         prioritized_starts = sorted(promising_starts.items(), key=lambda x: new_residues_sort_key(x[1]))
 
+        pprint('retrying with additional residues')
         iterate = False
         for start, effect in prioritized_starts:
+            pprint(start)
             result = test_start(modulo, residues, start)
             if result.has_completed:
                 full_effect = preview_new_residues(modulo, result.steps, j, k, residues)
-                pprint(start)
                 pprint(full_effect)
                 pprint(result.steps)
                 residues = {**residues, **full_effect}
@@ -285,6 +286,7 @@ def test_start(modulo, residues, start):
 
     has_started = True
     num_residues = len(proper_residues)
+    max_residue = proper_residues[-1]
     residue_index = 0
     start_length = len(start)
     length = start_length
@@ -292,16 +294,22 @@ def test_start(modulo, residues, start):
     while length < modulo:
        if residue_index == num_residues:
           # backtrack:
-          if length == start_length:
+          pprint('backtracking from:')
+          pprint(steps)
+          if length <= start_length:
               return StartResult(has_started, False, steps)
           else:
-              length -= 1
-              steps.pop()
-              points.pop()
+              # backtrack
+              steps.reverse()
+              step = steps.pop()
+              while step.step == max_residue:
+                 step = steps.pop()
+              steps.reverse()
+              length = len(steps)
+              points = [step.point for step in steps]
 
-              new_last_step = steps[-1]
-              point = new_last_step.point
-              residue_index = proper_residues.index(new_last_step.step) + 1
+              point = points[-1]
+              residue_index = proper_residues.index(step.step) + 1
 
        else:
           x = proper_residues[residue_index]
