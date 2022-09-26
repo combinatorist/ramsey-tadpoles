@@ -163,6 +163,31 @@ def scan():
           has_max_chord = is_primitive_root or k in(residues)
           has_min_inverse = is_primitive_root or (modulo - j) in(residues)
           has_max_inverse = is_primitive_root or (modulo - k) in(residues)
+          has_min = has_min_chord or has_min_inverse
+          has_max = has_max_chord or has_max_inverse
+          has_easy_contradiction = is_coprime and has_min and has_max
+          if is_coprime and not has_easy_contradiction:
+              # The trick here is to prove I can make a modulo cycle in red
+              # ... but using diverse length red chords
+              # Then, distinct combos of lengths would count as new chord to avoid.
+              # Specifically, a sequence in red with as many steps as avoided in blue.
+              # So, instead of multiplication, it's just repeated (diverse) addition.
+
+              total_residues = get_brute_residues(modulo, generator, residues)
+              brute_residues = [k for k, v in total_residues.items() if v.is_nontrivial]
+              total_residues_plain = residues + brute_residues
+
+              has_min_chord = j in(total_residues_plain)
+              has_max_chord = k in(total_residues_plain)
+              has_min_inverse = (modulo - j) in(total_residues_plain)
+              has_max_inverse = (modulo - k) in(total_residues_plain)
+              has_min = has_min_chord or has_min_inverse
+              has_max = has_max_chord or has_max_inverse
+              required_brute_residues = has_min and has_max
+          else:
+              brute_residues = []
+              required_brute_residues = False
+
           print(",".join(str(x) for x in [
               j,
               k,
@@ -173,7 +198,9 @@ def scan():
               1 if has_min_inverse else 0,
               1 if has_max_chord else 0,
               1 if has_max_inverse else 0,
-              "|".join(str(x) for x in residues)
+              1 if required_brute_residues else 0,
+              "|".join(str(x) for x in residues),
+              "|".join(str(x) for x in brute_residues)
           ]))
 
 StartResult = namedtuple('StartResult',
@@ -228,7 +255,7 @@ def get_brute_residues(modulo, generator, residues=None):
     def count_residues(rs):
         return len([r for r in rs.items() if r[1].in_both])
 
-    pprint(proper_residues)
+    #pprint(proper_residues)
     iterate = True
     while iterate:
         start_sequences = product(proper_residues, repeat=generator)
@@ -238,15 +265,15 @@ def get_brute_residues(modulo, generator, residues=None):
         promising_starts = {k: v for k,v in categorized_starts.items() if count_residues(v)}
         prioritized_starts = sorted(promising_starts.items(), key=lambda x: -count_residues(x[1]))
 
-        pprint('retrying with additional residues')
+        #pprint('retrying with additional residues')
         iterate = False
         for start, effect in prioritized_starts:
-            pprint(start)
+            #pprint(start)
             result = test_start(modulo, residues, start)
             if result.has_completed:
                 full_effect = preview_new_residues(modulo, result.steps, generator, residues)
-                pprint(full_effect)
-                pprint(result.steps)
+                #pprint(full_effect)
+                #pprint(result.steps)
                 residues = {**residues, **full_effect}
                 iterate = len([x for x in get_proper_residues(residues) if x != 0]) < modulo - 1
                 break
@@ -312,4 +339,4 @@ def test_start(modulo, residues, start):
     return StartResult(has_started, True, steps)
 
 if __name__ == '__main__':
-    pprint(get_brute_residues(13, 4))
+    scan()
