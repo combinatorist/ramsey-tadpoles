@@ -166,6 +166,8 @@ def scan():
           has_min = has_min_chord or has_min_inverse
           has_max = has_max_chord or has_max_inverse
           has_easy_contradiction = is_coprime and has_min and has_max
+          attempted_brute_residues = False
+
           if is_coprime and not has_easy_contradiction:
               # The trick here is to prove I can make a modulo cycle in red
               # ... but using diverse length red chords
@@ -184,6 +186,7 @@ def scan():
               has_min = has_min_chord or has_min_inverse
               has_max = has_max_chord or has_max_inverse
               required_brute_residues = has_min and has_max
+              attempted_brute_residues = True
           else:
               brute_residues = []
               required_brute_residues = False
@@ -199,9 +202,10 @@ def scan():
               1 if has_max_chord else 0,
               1 if has_max_inverse else 0,
               1 if required_brute_residues else 0,
+              1 if attempted_brute_residues else 0,
               "|".join(str(x) for x in residues),
               "|".join(str(x) for x in brute_residues)
-          ]))
+          ]), flush=True)
 
 StartResult = namedtuple('StartResult',
     [
