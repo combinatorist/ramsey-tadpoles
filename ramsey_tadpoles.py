@@ -146,6 +146,7 @@ def scan():
     # with open('./results.csv', 'w') as cache:
     modulo = 3
     while True:
+
       modulo += 1
       max_chord = modulo - 2
       for j in range(2, max_chord + 1):
