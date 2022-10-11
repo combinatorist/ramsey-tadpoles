@@ -24,6 +24,8 @@ from math import sqrt
 from collections import namedtuple
 from itertools import product, groupby
 from pprint import pprint
+import tracemalloc
+tracemalloc.start()
 
 def proof(chord1, chord2, modulus):
     """Find the first tadpole Ramsey number contradiction. Based on m-1, n-1"""
@@ -191,6 +193,11 @@ def scan():
           else:
               brute_residues = []
               required_brute_residues = False
+
+          snapshot = tracemalloc.take_snapshot()
+          top_stats = snapshot.statistics('lineno')
+          pprint("[ Top 10 ]")
+          pprint(top_stats[:10])
 
           print(",".join(str(x) for x in [
               j,
