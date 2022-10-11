@@ -1,3 +1,4 @@
+1. handle that residues sometimes end on a redundant 1
 1. write csv efficiently in chunks
 1. read and initialize with csv (rather than creating starting point arguments)
 1. consider speeding up implicit modpows in scan function
