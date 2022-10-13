@@ -1,3 +1,5 @@
+Oh my goard! Just realized with mixed chord-length cycles, the chord lengths no longer need to be coprime!
+
 Shit! It's totally recursive:
 1. I've been using the symmetric generator for the number of mixed length steps to count
 1. So, for example, suppose I'm avoiding mixed lengths in red.

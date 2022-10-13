@@ -167,31 +167,24 @@ def scan():
           has_min = has_min_chord or has_min_inverse
           has_max = has_max_chord or has_max_inverse
           has_easy_contradiction = is_coprime and has_min and has_max
-          attempted_brute_residues = False
 
-          if is_coprime and not has_easy_contradiction:
-              # The trick here is to prove I can make a modulo cycle in red
-              # ... but using diverse length red chords
-              # Then, distinct combos of lengths would count as new chord to avoid.
-              # Specifically, a sequence in red with as many steps as avoided in blue.
-              # ... times as many steps in as avoided in red again.
-              # So, instead of multiplication, it's just repeated (diverse) addition.
+          # The trick here is to prove I can make a modulo cycle in red
+          # ... but using diverse length red chords
+          # Then, distinct combos of lengths would count as new chord to avoid.
+          # Specifically, a sequence in red with as many steps as avoided in blue.
+          # ... times as many steps in as avoided in red again.
+          # So, instead of multiplication, it's just repeated (diverse) addition.
 
-              total_residues = get_brute_residues(modulo, generator, residues)
-              brute_residues = [k for k, v in total_residues.items() if v.is_nontrivial]
-              total_residues_plain = residues + brute_residues
+          total_residues = get_brute_residues(modulo, generator, residues)
+          brute_residues = [k for k, v in total_residues.items() if v.is_nontrivial]
+          total_residues_plain = residues + brute_residues
 
-              has_min_chord = j in(total_residues_plain)
-              has_max_chord = k in(total_residues_plain)
-              has_min_inverse = (modulo - j) in(total_residues_plain)
-              has_max_inverse = (modulo - k) in(total_residues_plain)
-              has_min = has_min_chord or has_min_inverse
-              has_max = has_max_chord or has_max_inverse
-              required_brute_residues = has_min and has_max
-              attempted_brute_residues = True
-          else:
-              brute_residues = []
-              required_brute_residues = False
+          has_min_chord = j in(total_residues_plain)
+          has_max_chord = k in(total_residues_plain)
+          has_min_inverse = (modulo - j) in(total_residues_plain)
+          has_max_inverse = (modulo - k) in(total_residues_plain)
+          has_min = has_min_chord or has_min_inverse
+          has_max = has_max_chord or has_max_inverse
 
           print(",".join(str(x) for x in [
               j,
@@ -203,8 +196,7 @@ def scan():
               1 if has_min_inverse else 0,
               1 if has_max_chord else 0,
               1 if has_max_inverse else 0,
-              1 if required_brute_residues else 0,
-              1 if attempted_brute_residues else 0,
+              0 if has_easy_contradiction else 1,
               "|".join(str(x) for x in residues),
               "|".join(str(x) for x in brute_residues)
           ]), flush=True)
@@ -227,8 +219,9 @@ ResidueBelonging = namedtuple('ResidueBelonging',
 def preview_new_residues(modulo, steps, generator, residues):
     residues = {k: v._replace(is_nontrivial=False) for k,v in residues.items()}
     new_residues = get_n_length_residues(modulo, steps, generator)
+    inverted_new_residues = invert(modulo, new_residues)
 
-    for i in new_residues:
+    for i in new_residues + inverted_new_residues:
         if not residues[i].in_both:
             residues[i] = ResidueBelonging(True, True)
     return {k:v for k,v in residues.items() if v.is_nontrivial}
@@ -246,16 +239,20 @@ def get_n_length_residues(modulo, steps, n):
 def get_proper_residues(residues):
     return sorted([k for k, v in residues.items() if v.in_both])
 
+def invert(modulo, residues):
+    return [modulo - r for r in residues]
+
 def get_brute_residues(modulo, generator, residues=None):
     # "Starts" optimize and prioritize minimum non-trivial subsequences
     # ... so we don't have to check all possible (mostly redundant) sequences
     # We mill still redundantly check one start while working on another
     # ... but it still shouldn't be as bad as trying all possible sequences.
     if not residues:
+        # doesn't get inverted resides, but also not used
         residues = get_residues(generator, modulo)
     if type(residues) is list:
-        residues = {k: k in residues for k in range(modulo)}
-        residues = {k: ResidueBelonging(v, False) for k,v in residues.items()}
+        inverted = invert(modulo, residues)
+        residues = {k: ResidueBelonging(k in residues + inverted, False) for k in range(modulo)}
     proper_residues = get_proper_residues(residues)
 
     def count_residues(rs):
