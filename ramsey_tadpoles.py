@@ -174,6 +174,7 @@ def scan():
               # ... but using diverse length red chords
               # Then, distinct combos of lengths would count as new chord to avoid.
               # Specifically, a sequence in red with as many steps as avoided in blue.
+              # ... times as many steps in as avoided in red again.
               # So, instead of multiplication, it's just repeated (diverse) addition.
 
               total_residues = get_brute_residues(modulo, generator, residues)
