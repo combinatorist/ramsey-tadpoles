@@ -148,7 +148,7 @@ def scan():
     while True:
 
       modulo += 1
-      max_chord = modulo - 2
+      max_chord = modulo // 2
       for j in range(2, max_chord + 1):
         for k in range(j, max_chord + 1):
           generator = (j * k) % modulo
