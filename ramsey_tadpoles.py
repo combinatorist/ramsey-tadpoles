@@ -144,7 +144,7 @@ BruteStep = namedtuple(
 
 def scan():
     # with open('./results.csv', 'w') as cache:
-    modulo = 13
+    modulo = 3
     while True:
 
       modulo += 1
