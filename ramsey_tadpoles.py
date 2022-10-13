@@ -221,7 +221,7 @@ def preview_new_residues(modulo, steps, generator, residues):
     new_residues = get_n_length_residues(modulo, steps, generator)
     inverted_new_residues = invert(modulo, new_residues)
 
-    for i in new_residues + inverted_new_residues:
+    for i in list(new_residues) + inverted_new_residues:
         if not residues[i].in_both:
             residues[i] = ResidueBelonging(True, True)
     return {k:v for k,v in residues.items() if v.is_nontrivial}
@@ -240,7 +240,7 @@ def get_proper_residues(residues):
     return sorted([k for k, v in residues.items() if v.in_both])
 
 def invert(modulo, residues):
-    return [modulo - r for r in residues]
+    return [modulo - r for r in residues if r != 0]
 
 def get_brute_residues(modulo, generator, residues=None):
     # "Starts" optimize and prioritize minimum non-trivial subsequences
