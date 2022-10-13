@@ -265,7 +265,7 @@ def get_brute_residues(modulo, generator, residues=None):
     iterate = True
     while iterate:
         start_sequences = product(proper_residues, repeat=generator)
-        normalized_starts = (sorted([v[::1], v[::1]])[0] for v in start_sequences)
+        normalized_starts = (sorted([v[::1], v[::-1]])[0] for v in start_sequences)
         distinct_starts = set(normalized_starts)
         categorized_starts = {start: preview_new_residues(modulo, (BruteStep(x, 0) for x in start), generator, residues) for start in distinct_starts}
         promising_starts = {k: v for k,v in categorized_starts.items() if count_residues(v)}
