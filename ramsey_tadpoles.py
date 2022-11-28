@@ -144,17 +144,13 @@ BruteStep = namedtuple(
 
 def scan():
     # with open('./results.csv', 'w') as cache:
-    starting_modulo = 11
+    starting_modulo = 3
     modulo = starting_modulo
     is_first_loop = True
     while True:
       max_chord = modulo // 2
       for j in range(2, max_chord + 1):
-        if j == 2 and modulo == 11:
-          starting_k = 6
-        else:
-          starting_k = j
-        for k in range(starting_k, max_chord + 1):
+        for k in range(j, max_chord + 1):
           generator = (j * k) % modulo
           residues = get_residues(generator, modulo)
           is_primitive_root = len(residues) == modulo - 1
