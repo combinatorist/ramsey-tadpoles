@@ -25,3 +25,4 @@ Out[2]: (True, True, True, "0 overlap contradict's, 2 undirected edge contradict
 * Nearest Ramsey Upper Bound Calculator
 * Efficient {Red, Blue, Neither} graph coloring data structure
 * Method to find tadpoles within a colored graph
+

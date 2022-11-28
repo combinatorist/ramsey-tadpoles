@@ -1,3 +1,5 @@
+1. brute force characterize all distinct sets of chord-lengths capable of covering a modulo
+
 Oh my goard! Just realized with mixed chord-length cycles, the chord lengths no longer need to be coprime!
 
 Shit! It's totally recursive:
