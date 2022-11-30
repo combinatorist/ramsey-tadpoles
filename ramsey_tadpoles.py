@@ -22,7 +22,7 @@ Created on Sat Dec 13 08:12:08 2014
 
 from math import sqrt
 from collections import namedtuple
-from itertools import product, groupby
+from itertools import product
 from pprint import pprint
 
 def proof(chord1, chord2, modulus):
@@ -261,17 +261,18 @@ def get_brute_residues(modulo, generator, residues=None):
 
     #pprint(proper_residues)
     iterate = True
+    distinct_starts = set()
     while iterate:
         start_sequences = product(proper_residues, repeat=generator)
-        normalized_starts = (sorted([v[::1], v[::-1]])[0] for v in start_sequences)
-        distinct_starts = set(normalized_starts)
-        categorized_starts = {start: preview_new_residues(modulo, (BruteStep(x, 0) for x in start), generator, residues) for start in distinct_starts}
-        promising_starts = {k: v for k,v in categorized_starts.items() if count_residues(v)}
-        prioritized_starts = sorted(promising_starts.items(), key=lambda x: -count_residues(x[1]))
+        normalized = map(lambda v: sorted([v[::1], v[::-1]])[0], start_sequences)
 
         #pprint('retrying with additional residues')
         iterate = False
-        for start, effect in prioritized_starts:
+        for start in normalized:
+            if start in distinct_starts or not count_residues(preview_new_residues(modulo, (BruteStep(x, 0) for x in start), generator, residues)):
+                break
+            distinct_starts.append(start)
+
             #pprint(start)
             result = test_start(modulo, residues, start)
             if result.has_completed:
@@ -281,6 +282,11 @@ def get_brute_residues(modulo, generator, residues=None):
                 residues = {**residues, **full_effect}
                 iterate = len([x for x in get_proper_residues(residues) if x != 0]) < modulo - 1
                 break
+
+        del start_sequences
+        del normalized
+
+    del distinct_starts
 
     return residues
 
