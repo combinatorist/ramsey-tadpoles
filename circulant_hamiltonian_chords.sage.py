@@ -32,8 +32,6 @@ def all_generated_chords(generator, node_lists):
     return set().union(generated_chords(generator, node_list) for node_list in node_lists)
 all_generated_chords(4, results)
 def all_generated_chords(generator, node_lists):
-    return set().union(*generated_chords(generator, node_list) for node_list in node_lists)
-def all_generated_chords(generator, node_lists):
     return set().union(*(generated_chords(generator, node_list) for node_list in node_lists))
 all_generated_chords(4, results)
 target.subgraph_search_count(pattern)
@@ -45,7 +43,6 @@ def generated_chords(generator, nodes):
     double = nodes + nodes[:generator]
     modulus = len(nodes)
     return set((double[i+generator] - double[i]) % modulus for i in range(modulus))
-IPython.terminal.shortcuts.open_input_in_editor.
 IPython.terminal.shortcuts.open_input_in_editor
 Sage.terminal.shortcuts.open_input_in_editor
 sage.terminal.shortcuts.open_input_in_editor
@@ -57,29 +54,13 @@ def search_cycles(modulus, root_generator):
     return all_generated_chords(root_generator, results)
 search_cycles(13,4)
 def get_residues(generator, modulo):
-        residues = [1, generator]
-            residue = generator * generator % modulo
-    while residue not in residues:
-            residues.append(residue)
-                residue = residue * generator % modulo
-    return residues
-%paste
-%pastemode
-%paste def get_residues(generator, modulo):
     residues = [1, generator]
     residue = generator * generator % modulo
     while residue not in residues:
             residues.append(residue)
-                residue = residue * generator % modulo
+            residue = residue * generator % modulo
     return residues
-%edit
 search_cycles(13,4)
-def all_generated_chords(generator, node_lists, modulus=None):
-    if not modulus:
-        start = next(node_lists)
-        modulus = len(start)
-    return set().union(*(generated_chords(generator, node_list) for node_list in node_lists))
-%edit prev
 def all_generated_chords(generator, node_lists, modulus=None):
     if not modulus:
         start = next(node_lists)
@@ -151,16 +132,14 @@ def search_examples():
             else:
                 print(f'm:{modulus}, r:{root_generator}: {modulus - 1 - len(result)} missing')
                 print(result)
-%edit
+#%edit
 search_examples()
 def coprime(k,l):
     return gcd(k,l) == 1
 coprime(13,4)
 coprime(15,5)
 search_examples()
-%store dir(search_examples) >test
-%store search_examples()
-%store search_examples() > ramsey-results.txt
+#%store search_examples() > ramsey-results.txt
 def search_examples(fileprefix='~/ramsey-results.txt'):
   with open(fileprefix + now(), 'w') as f:
     modulus = 3
@@ -178,7 +157,6 @@ def search_examples(fileprefix='~/ramsey-results.txt'):
 search_examples()
 from datetime.datetime import now
 from datetime import now
-from datetime import datetime.now
 from datetime import datetime
 def search_examples(fileprefix='~/ramsey-results.txt'):
   with open(fileprefix + datetime.now(), 'w') as f:
@@ -225,10 +203,8 @@ def search_examples(fileprefix='~/ramsey-results.txt'):
                 f.write(f'm:{modulus}, r:{root_generator}: {modulus - 1 - len(result)} missing')
                 f.write(result)
 from datetime import today
-from datetime import date.today
 from datetime import date
 from date import today
-def today = date.today
 today = date.today
 def search_examples(fileprefix='~/ramsey-results.txt'):
   with open(fileprefix + str(today()), 'w') as f:
@@ -292,8 +268,7 @@ def search_examples(fileprefix='ramsey-results.txt'):
                 f.write(f'm:{modulus}, r:{root_generator}: {modulus - 1 - len(result)} missing')
                 f.write(str(sorted(result)))
 search_examples()
-%edit _
-%edit
+#%edit
 def search_examples(fileprefix='ramsey-results.txt'):
   with open(fileprefix + str(now()), 'w') as f:
     modulus = 3
@@ -309,24 +284,17 @@ def search_examples(fileprefix='ramsey-results.txt'):
                 f.write(f'm:{modulus}, r:{root_generator}: {modulus - 1 - len(result)} missing')
                 f.write(str(sorted(result)))
                 q
-%edit
+#%edit
 search_examples()
-%edit search_examples
+#%edit search_examples
 search_examples()
-%edit search_examples
-%edit search_examples
+#%edit search_examples
+#%edit search_examples
 search_examples()
-%edit search_examples
+#%edit search_examples
 search_examples()
-%edit search_examples
+#%edit search_examples
 search_examples()
-%edit search_examples
+#%edit search_examples
 search_examples()
-%save circulant_hamiltonian_chords.sage.py
-%save
-%save * circulant_hamiltonian_chords.sage.py
-%save history circulant_hamiltonian_chords.sage.py
-%save circulant_hamiltonian_chords.sage.py history
-%save circulant_hamiltonian_chords.sage.py %history
-%history
-%history -f circulant_hamiltonian_chords.sage.py
+#%history -f circulant_hamiltonian_chords.sage.py
