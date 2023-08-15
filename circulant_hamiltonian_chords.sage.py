@@ -40,10 +40,13 @@ def coprime(k,l):
 
 def search_examples(fileprefix='ramsey-results.txt'):
   with open(fileprefix + str(now()), 'w') as f:
-    modulus = 3
+    modulus = 5
     while True:
-        modulus += 1
-        for root_generator in range(2, modulus - 1):
+        # skip evens for now (very slow, predictable counterexamples)
+        modulus += 2
+        # skip root_generator=2 (trivial?)
+        # skip second half of root_generators (symmetric?)
+        for root_generator in range(3, modulus // 2 + 1):
             if not coprime(root_generator, modulus):
                 continue
             result = search_cycles(modulus, root_generator)
