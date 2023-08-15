@@ -34,6 +34,7 @@ def all_generated_chords(generator, node_lists, modulus=None):
         if len(chords) + 1 == modulus:
             break
     return chords
+
 def coprime(k,l):
     return gcd(k,l) == 1
 
