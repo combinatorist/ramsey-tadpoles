@@ -78,6 +78,8 @@ def search_examples(fileprefix='ramsey-results.txt'):
             else:
                 f.write(f'm:{modulus}, r:{root_generator}: {modulus - 1 - len(result)} missing')
                 f.write(str(sorted(result)))
+            f.write("\n")
+            f.flush()
 search_examples()
 #%edit search_examples
 search_examples()
