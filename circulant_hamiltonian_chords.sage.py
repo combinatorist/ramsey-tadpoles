@@ -1,4 +1,5 @@
 from sage.all import *
+from itertools import chain
 from datetime import datetime
 now = datetime.now
 
@@ -14,7 +15,6 @@ def get_residues(generator, modulo):
             residues.append(residue)
             residue = residue * generator % modulo
     return residues
-import itertools
 
 def search_cycles(modulus, root_generator):
     powers = get_residues(root_generator, modulus)
@@ -27,7 +27,7 @@ def all_generated_chords(generator, node_lists, modulus=None):
     if not modulus:
         start = next(node_lists)
         modulus = len(start)
-        node_lists = itertools.chain([start], node_lists)
+        node_lists = chain([start], node_lists)
     chords = set()
     for node_list in node_lists:
         chords.update(generated_chords(generator, node_list))
