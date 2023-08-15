@@ -47,11 +47,9 @@ def search_examples(fileprefix='ramsey-results.txt'):
             if not coprime(root_generator, modulus):
                 continue
             result = search_cycles(modulus, root_generator)
-            if len(result) == modulus - 1:
-                f.write(f'm:{modulus}, r:{root_generator}: all found')
-            else:
-                f.write(f'm:{modulus}, r:{root_generator}: {modulus - 1 - len(result)} missing')
-                f.write(str(sorted(result)))
+            expected = set(range(1, modulus))
+            f.write(f'm:{modulus}, r:{root_generator}: {len(expected) - len(result)} missing:')
+            f.write(str(sorted(expected.difference(result))))
             f.write("\n")
             f.flush()
 #search_examples()
