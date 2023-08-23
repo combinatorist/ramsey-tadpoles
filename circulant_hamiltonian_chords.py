@@ -46,7 +46,10 @@ def id_unused_vertices():
 
 def search_hamiltonian_via_subtraction(modulus=13, root_generator=4):
     powers = get_residues(root_generator, modulus)
-    target = graphs.CirculantGraph(modulus, powers)
+    # powers = [1,4] # minimal undirected example
+    powers = [4,12] # minimal directed example
+    print(powers)
+    target = digraphs.Circulant(modulus, powers)
     target.delete_vertex(4)
     hamiltonian = target.hamiltonian_path(5,0)
     print(hamiltonian.all_paths(5,0)[0])
