@@ -38,6 +38,23 @@ def all_generated_chords(generator, node_lists, modulus=None):
 def coprime(k,l):
     return gcd(k,l) == 1
 
+def possible_chords(modulus, root_generator):
+    pass
+
+def id_unused_vertices():
+    pass
+
+def search_hamiltonian_via_subtraction(modulus=13, root_generator=4):
+    powers = get_residues(root_generator, modulus)
+    target = graphs.CirculantGraph(modulus, powers)
+    target.delete_vertex(4)
+    hamiltonian = target.hamiltonian_path(5,0)
+    print(hamiltonian.all_paths(5,0)[0])
+    P = hamiltonian.plot()
+    # P.show()
+    P.save_image('figure.png')
+    return P
+
 def search_examples(fileprefix='ramsey-results.txt', search_function=search_cycles):
   with open(fileprefix + str(now()), 'w') as f:
     modulus = 5
@@ -60,4 +77,4 @@ def search_examples(fileprefix='ramsey-results.txt', search_function=search_cycl
 #search_examples()
 #%edit search_examples
 if __name__ == "__main__":
-  search_examples()
+  search_hamiltonian_via_subtraction()
