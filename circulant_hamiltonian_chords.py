@@ -38,7 +38,7 @@ def all_generated_chords(generator, node_lists, modulus=None):
 def coprime(k,l):
     return gcd(k,l) == 1
 
-def search_examples(fileprefix='ramsey-results.txt'):
+def search_examples(fileprefix='ramsey-results.txt', search_function=search_cycles):
   with open(fileprefix + str(now()), 'w') as f:
     modulus = 5
     while True:
@@ -49,12 +49,14 @@ def search_examples(fileprefix='ramsey-results.txt'):
         for root_generator in range(3, modulus // 2 + 1):
             if not coprime(root_generator, modulus):
                 continue
-            result = search_cycles(modulus, root_generator)
+            result = search_function(modulus, root_generator)
             expected = set(range(1, modulus))
             f.write(f'm:{modulus}, r:{root_generator}: {len(expected) - len(result)} missing:')
             f.write(str(sorted(expected.difference(result))))
             f.write("\n")
             f.flush()
+
+
 #search_examples()
 #%edit search_examples
 if __name__ == "__main__":
