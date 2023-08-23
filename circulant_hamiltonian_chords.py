@@ -57,4 +57,5 @@ def search_examples(fileprefix='ramsey-results.txt'):
             f.flush()
 #search_examples()
 #%edit search_examples
-search_examples()
+if __name__ == "__main__":
+  search_examples()
