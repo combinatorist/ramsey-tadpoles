@@ -19,22 +19,18 @@ object Main {
 }
 
 case class WithSpark(spark: SparkSession) {
-  val sc = spark
   import spark.implicits._
 
-  def possiblePathsParallel(modulo: Long, partitions: Int) = sc
+  def possiblePathsParallel(modulo: Long, partitions: Int) = spark
     .range(partitions)
     .map(_ + 1L) //no 0 -> 0 self loop
     .repartition(partitions)
     .mapPartitions(pure.F.possiblePaths(modulo))
 
   def fromScratch(modulo: Long, partitions: Int) = {
-    var df = possiblePathsParallel(modulo, partitions)
-    df.show(false)
-    df = df.map(pure.F.toChordSeq(modulo) _)
-    df.show(false)
-    df = df.filter(pure.F.isCanonical(modulo.toInt) _)
-    df
+    possiblePathsParallel(modulo, partitions)
+      .map(pure.F.toChordSeq(modulo))
+      .filter(pure.F.isCanonical(modulo.toInt) _)
   }
 
 }
