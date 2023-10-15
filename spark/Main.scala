@@ -5,15 +5,16 @@ object Main {
     SparkSession.builder.appName("Spark Ramsey").getOrCreate()
 
   def main(args: Array[String]): Unit = {
-    val df = process
+    val modulo = 13L
+    val df = process(modulo)
     df.sparkSession.stop()
   }
 
-  def process(): Dataset[Row] = {
+  def process(modulo: Long): Dataset[Row] = {
     val spark = session
-    val df = WithSpark(spark).fromScratch(4, 4 - 1)
+    val df = WithSpark(spark).fromScratch(modulo, modulo.toInt - 1)
     df.show(false)
-    df.write.mode("overwrite").save("df-overwritten")
+    df.write.mode("overwrite").save(s"df-overwritten-mod-$modulo")
     df.toDF
   }
 }
