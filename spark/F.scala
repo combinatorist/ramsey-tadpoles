@@ -29,9 +29,10 @@ object F {
     .flatMap(possiblePaths(modulo, _))
 
   def possiblePaths(modulo: Long, first: Long): Iterator[Seq[Long]] = otherNodes(modulo)
-    .filterNot( _ == first)
+    .filterNot(_ == first)
     .permutations
-    .map(0L +: first +: _ :+ 0)
+    // rotating one position avoids partition skew later in isCanonical
+    .map(first +: _ :+ 0L :+ first)
 
   def toChordSeq(modulo: Long)(wrappedCycle: Seq[Long]) = wrappedCycle
     .sliding(2)
