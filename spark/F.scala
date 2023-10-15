@@ -1,38 +1,10 @@
-import org.apache.spark.sql.{SparkSession, Dataset, Row}
-
+package pure
 object Main {
-  def session() =
-    SparkSession.builder.appName("Spark Ramsey").getOrCreate()
-
   def main(args: Array[String]): Unit = {
-    val df = process
-    df.sparkSession.stop()
+    val modulo = 3
+    val chordSeq = Seq(0,1,2).map(_.toLong)
+    assert(F.isCanonical(modulo)(chordSeq))
   }
-
-  def process(): Dataset[Row] = {
-    val spark = session
-    val df = WithSpark(spark).fromScratch(8, 8)
-    df.show(false)
-    df.write.mode("overwrite").save("df-overwritten")
-    df.toDF
-  }
-}
-
-case class WithSpark(spark: SparkSession) {
-  val sc = spark
-  import spark.implicits._
-
-  def possiblePathsParallel(modulo: Long, partitions: Int) = sc
-    .range(partitions)
-    .map(_.toLong)
-    .repartition(partitions)
-    .mapPartitions(F.possiblePaths(modulo))
-
-  def fromScratch(modulo: Long, partitions: Int = 12) =
-    possiblePathsParallel(modulo, partitions)
-      .map(F.chordSeq _)
-      .filter(F.isCanonical(modulo.toInt) _)
-
 }
 
 object F {
@@ -68,6 +40,7 @@ object F {
     .drop(1) //don't start with the current chordSeq!
     .sliding(modulo)
     .takeWhile(_ != chordSeq)
+    .take(modulo)
     .exists(lessThanSeq(_, chordSeq))
 
 }
