@@ -1,12 +1,19 @@
 package pure
-object Main2 {
+
+object Main {
   def main(args: Array[String]): Unit = {
     val modulo = 3
-    val chordSeq = Seq(0,1,2).map(_.toLong)
+    val nodeSeq = Seq(0,1,2,0).map(_.toLong)
+    val chordSeq = F.toChordSeq(modulo)(nodeSeq)
+    println(chordSeq)
+    assert(chordSeq == Seq(1,1,1))
+    /*
     assert(F.lessThanSeq(Seq(0,1,2), Seq(1,2,0)))
     assert(!F.lessThanSeq(Seq(0,1,2), Seq(0,1,2)))
     assert(!F.lessThanSeq(Seq(1,2,0), Seq(0,1,2)))
-    assert(F.isCanonical(modulo)(chordSeq))
+    */
+    assert(!F.isCanonical(modulo)(Seq(1,2,0)))
+    assert(F.isCanonical(modulo)(Seq(0,1,2)))
   }
 }
 
@@ -27,11 +34,11 @@ object F {
   def possiblePaths(modulo: Long, first: Long): Iterator[Seq[Long]] = otherNodes(modulo)
     .filterNot( _ == first)
     .permutations
-    .map(first +: _ :+ 0)
+    .map(0L +: first +: _ :+ 0)
 
-  def chordSeq(wrappedCycle: Seq[Long]) = wrappedCycle
-    .sliding(2, 10)
-    .map(x => x.last - x.head)
+  def toChordSeq(modulo: Long)(wrappedCycle: Seq[Long]) = wrappedCycle
+    .sliding(2)
+    .map(x => (modulo + x.last - x.head) % modulo)
     .toSeq
 
   // assumes same length
