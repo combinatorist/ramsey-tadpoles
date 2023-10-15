@@ -1,8 +1,11 @@
 package pure
-object Main {
+object Main2 {
   def main(args: Array[String]): Unit = {
     val modulo = 3
     val chordSeq = Seq(0,1,2).map(_.toLong)
+    assert(F.lessThanSeq(Seq(0,1,2), Seq(1,2,0)))
+    assert(!F.lessThanSeq(Seq(0,1,2), Seq(0,1,2)))
+    assert(!F.lessThanSeq(Seq(1,2,0), Seq(0,1,2)))
     assert(F.isCanonical(modulo)(chordSeq))
   }
 }
@@ -32,17 +35,34 @@ object F {
     .toSeq
 
   // assumes same length
-  def lessThanSeq(a: Seq[Long], b: Seq[Long]) = a.lazyZip(b).exists(_ < _)
+  def lessThanSeq(a: Seq[Long], b: Seq[Long]) = {
+    println(a, b)
+    val soFar = a.lazyZip(b)
+    .dropWhile(x => x._1 == x._2)
+    println(soFar.toSeq)
+    soFar
+    .toIterator
+    .nextOption
+    .exists{ case(c: Long,d: Long) => println(c,d); c < d}
+  }
 
-  def isCanonical(modulo: Int)(chordSeq: Seq[Long]) = !Iterator
+  def isCanonical(modulo: Int)(chordSeq: Seq[Long]) = {
+   val soFar = Iterator
     .continually(chordSeq)
     .flatten
     .drop(1) //don't start with the current chordSeq!
     .sliding(modulo)
+    .map(_.toSeq)
     .takeWhile(_ != chordSeq)
     .take(modulo)
+    .toSeq
+
+  println(soFar)
+
+   !soFar
     .exists(lessThanSeq(_, chordSeq))
 
+  }
 }
 
 /*
