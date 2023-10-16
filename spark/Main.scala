@@ -13,7 +13,7 @@ object Main {
   def process(modulo: Long): Dataset[Row] = {
     val spark = session
     val df = WithSpark(spark).fromScratch(modulo, modulo.toInt - 1)
-    df.show(false)
+    df.cache.show(false)
     df.write.mode("overwrite").save(s"df-overwritten-mod-$modulo")
     df.toDF
   }
