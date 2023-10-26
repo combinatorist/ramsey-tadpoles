@@ -13,7 +13,6 @@ object Main {
   def process(modulo: Long): Dataset[Row] = {
     val spark = session
     val df = WithSpark(spark).fromScratch(modulo, modulo.toInt - 1)
-    df.cache.show(false)
     // likely need sudo access for second disk. :(
     df.write.mode("overwrite").save(s"/data/ramsey/spark/df-overwritten-mod-$modulo")
     df.toDF
