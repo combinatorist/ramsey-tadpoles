@@ -2,7 +2,7 @@ name := "spark-ramsey-numbers"
 
 version := "0.1"
 
-scalaVersion := "2.13.9"
+scalaVersion := "2.13.14"
 
 val sparkVersion = "3.5.0"
 
