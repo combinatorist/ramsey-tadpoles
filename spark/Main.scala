@@ -1,4 +1,4 @@
-import org.apache.spark.sql.{SparkSession, Dataset, Row}
+import org.apache.spark.sql.{SparkSession, Dataset, Row, functions => F}
 
 object Main {
   def session() =
@@ -12,9 +12,11 @@ object Main {
 
   def process(modulo: Long): Dataset[Row] = {
     val spark = session
+    import spark.sqlContext.implicits._
     val df = WithSpark(spark).fromScratch(modulo, modulo.toInt - 1)
-    // likely need sudo access for second disk. :(
-    df.write.mode("overwrite").save(s"/data/ramsey/spark/df-overwritten-mod-$modulo")
+      .withColumn("modulo", F.lit(modulo))
+      .withColumn("timestamp", F.current_timestamp())
+    df.write.mode("append").partitionBy("timestamp", "modulo").save(s"/data/ramsey/spark/dated/")
     df.toDF
   }
 }
