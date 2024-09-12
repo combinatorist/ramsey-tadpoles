@@ -1,4 +1,5 @@
 # run
+[Use linux laptop to run spark scala calcs (saves to data disc, etc.]
 
 ```bash
 sbt package
