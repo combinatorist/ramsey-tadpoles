@@ -58,6 +58,7 @@ def search_hamiltonian_via_subtraction(modulus=13, root_generator=4):
     P.save_image('figure.png')
     return P
 
+# Historical runs have been moved manually to /data/ramsey/python/circulant
 def search_examples(fileprefix='ramsey-results.txt', search_function=search_cycles):
   with open(fileprefix + str(now()), 'w') as f:
     modulus = 5
