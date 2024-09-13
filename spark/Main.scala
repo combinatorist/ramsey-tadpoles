@@ -14,7 +14,7 @@ object Main {
 
   def gitBranch = Process("git branch --show-current").lazyLines.head
   def gitSha = Process("git rev-parse --short HEAD").lazyLines.head
-  def gitIsDirty = Process("git status --short").lazyLines.head.nonEmpty
+  def gitIsDirty = Process("git status --short").lazyLines.nonEmpty
 
   def process(modulo: Long): Dataset[Row] = {
     val spark = session
