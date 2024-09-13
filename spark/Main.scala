@@ -1,4 +1,5 @@
 import org.apache.spark.sql.{SparkSession, Dataset, Row, functions => F}
+import scala.sys.process._
 
 object Main {
   def session() =
@@ -10,13 +11,23 @@ object Main {
     df.sparkSession.stop()
   }
 
+
+  def gitBranch = Process("git branch --show-current").lazyLines.head
+  def gitSha = Process("git rev-parse --short HEAD").lazyLines.head
+  def gitIsDirty = Process("git status --short").lazyLines.head.nonEmpty
+
   def process(modulo: Long): Dataset[Row] = {
     val spark = session
     import spark.sqlContext.implicits._
     val df = WithSpark(spark).fromScratch(modulo, modulo.toInt - 1)
       .withColumn("modulo", F.lit(modulo))
       .withColumn("timestamp", F.current_timestamp())
-    df.write.mode("append").partitionBy("timestamp", "modulo").save(s"/data/ramsey/spark/dated/")
+      .withColumn("git_branch", F.lit(gitBranch))
+      .withColumn("git_sha", F.lit(gitSha))
+      .withColumn("git_is_dirty", F.lit(gitIsDirty))
+    df.write.mode("append")
+      .partitionBy("timestamp", "modulo", "git_branch", "git_sha", "git_is_dirty")
+      .save(s"/data/ramsey/spark/dated/")
     df.toDF
   }
 }
