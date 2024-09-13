@@ -37,8 +37,7 @@ object Main {
       .mode("append")
       .partitionBy(
         "storage_version",
-        "timestamp",
-        "modulo",
+        "log_time",
         "git_branch",
         "git_sha",
         "git_author_date",
@@ -53,7 +52,7 @@ object Main {
       .withColumn("storage_version", F.lit("v3.0"))
       .withColumn("run_id", F.lit(runId))
     df.write.mode("append")
-      .partitionBy("storage_version", "run_id")
+      .partitionBy("storage_version", "modulo", "run_id")
       .save(s"/data/ramsey/spark/hamiltonian_chord_sequences/")
 
 
