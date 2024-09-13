@@ -1,5 +1,6 @@
 import org.apache.spark.sql.{SparkSession, Dataset, Row, functions => F}
 import scala.sys.process._
+import java.util.UUID
 
 object Main {
   def session() =
@@ -11,7 +12,6 @@ object Main {
     df.sparkSession.stop()
   }
 
-
   def gitBranch = Process("git branch --show-current").lazyLines.head
   def gitSha = Process("git rev-parse --short HEAD").lazyLines.head
   def gitAuthorDate = Process("""git log -n1 --format="%ad" --date=iso-strict""")
@@ -20,19 +20,37 @@ object Main {
   def gitIsDirty = Process("git status --short").lazyLines.nonEmpty
 
   def process(modulo: Long): Dataset[Row] = {
+    val runId = UUID.randomUUID().toString
     val spark = session
     import spark.sqlContext.implicits._
+    val logDf = List(runId).toDF()
+      .withColumn("storage_version", F.lit("v1.0"))
+
+    def log(logEnd: Boolean) = logDf
+      .withColumn("log_type", F.lit(if (logEnd) "end" else "start"))
+      .withColumn("log_time", F.current_timestamp())
+      .write.mode("append")
+      .partitionBy("storage_version")
+      .save("/data/ramsey/spark/run_log")
+
+    log(logEnd=false)
+
     val df = WithSpark(spark).fromScratch(modulo, modulo.toInt - 1)
       .withColumn("modulo", F.lit(modulo))
-      .withColumn("storage_version", F.lit("v1.0"))
+      .withColumn("storage_version", F.lit("v2.0"))
+      .withColumn("run_id", F.lit(runId))
       .withColumn("timestamp", F.current_timestamp())
       .withColumn("git_branch", F.lit(gitBranch))
       .withColumn("git_sha", F.lit(gitSha))
       .withColumn("git_author_date", F.lit(gitAuthorDate))
       .withColumn("git_is_dirty", F.lit(gitIsDirty))
     df.write.mode("append")
-      .partitionBy("storage_version", "timestamp", "modulo", "git_branch", "git_sha", "git_author_date", "git_is_dirty")
-      .save(s"/data/ramsey/spark/dated/")
+      .partitionBy("storage_version", "run_id", "timestamp", "modulo", "git_branch", "git_sha", "git_author_date", "git_is_dirty")
+      .save(s"/data/ramsey/spark/hamiltonian_chord_sequences/")
+
+
+    log(logEnd=true)
+
     df.toDF
   }
 }
