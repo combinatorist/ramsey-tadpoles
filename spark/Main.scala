@@ -14,6 +14,9 @@ object Main {
 
   def gitBranch = Process("git branch --show-current").lazyLines.head
   def gitSha = Process("git rev-parse --short HEAD").lazyLines.head
+  def gitAuthorDate = Process("""git log -n1 --format="%ad" --date=iso-strict""")
+    .lazyLines
+     .head
   def gitIsDirty = Process("git status --short").lazyLines.nonEmpty
 
   def process(modulo: Long): Dataset[Row] = {
@@ -21,12 +24,14 @@ object Main {
     import spark.sqlContext.implicits._
     val df = WithSpark(spark).fromScratch(modulo, modulo.toInt - 1)
       .withColumn("modulo", F.lit(modulo))
+      .withColumn("storage_version", F.lit("v1.0"))
       .withColumn("timestamp", F.current_timestamp())
       .withColumn("git_branch", F.lit(gitBranch))
       .withColumn("git_sha", F.lit(gitSha))
+      .withColumn("git_author_date", F.lit(gitAuthorDate))
       .withColumn("git_is_dirty", F.lit(gitIsDirty))
     df.write.mode("append")
-      .partitionBy("timestamp", "modulo", "git_branch", "git_sha", "git_is_dirty")
+      .partitionBy("storage_version", "timestamp", "modulo", "git_branch", "git_sha", "git_author_date", "git_is_dirty")
       .save(s"/data/ramsey/spark/dated/")
     df.toDF
   }
