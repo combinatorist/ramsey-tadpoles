@@ -4,7 +4,7 @@ import java.util.UUID
 
 object Main {
   def session() =
-    SparkSession.builder.appName("Spark Ramsey").getOrCreate()
+    SparkSession.builder().appName("Spark Ramsey").getOrCreate()
 
   def main(args: Array[String]): Unit = {
     val modulo = args(0).toLong
@@ -21,7 +21,7 @@ object Main {
 
   def process(modulo: Long): Dataset[Row] = {
     val runId = UUID.randomUUID().toString
-    val spark = session
+    val spark = session()
     import spark.sqlContext.implicits._
     val logDf = List(runId).toDF()
       .withColumn("storage_version", F.lit("v2.0"))
@@ -59,7 +59,7 @@ object Main {
 
     log(logEnd=true)
 
-    df.toDF
+    df.toDF()
   }
 }
 
