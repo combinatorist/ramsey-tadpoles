@@ -18,3 +18,7 @@ jitwatch.out
 # other
 .bsp
 .history
+
+# spark-shell
+derby.log
+metastore_db/
