@@ -7,7 +7,7 @@ object Main {
     SparkSession.builder().appName("Spark Ramsey").getOrCreate()
 
   def main(args: Array[String]): Unit = {
-    val modulo = args(0).toLong
+    val modulo = args(0).toShort
     val df = process(modulo)
     df.sparkSession.stop()
   }
@@ -19,7 +19,7 @@ object Main {
      .head
   def gitIsDirty = Process("git status --short").lazyLines.nonEmpty
 
-  def process(modulo: Long): Dataset[Row] = {
+  def process(modulo: Short): Dataset[Row] = {
     val runId = UUID.randomUUID().toString
     val spark = session()
     import spark.sqlContext.implicits._
@@ -65,13 +65,13 @@ object Main {
 case class WithSpark(spark: SparkSession) {
   import spark.implicits._
 
-  def possiblePathsParallel(modulo: Long, partitions: Int) = spark
+  def possiblePathsParallel(modulo: Short, partitions: Int) = spark
     .range(partitions)
     .map(_ + 1L) //no 0 -> 0 self loop
     .repartition(partitions)
     .mapPartitions(pure.F.possiblePaths(modulo))
 
-  def fromScratch(modulo: Long, partitions: Int) = {
+  def fromScratch(modulo: Short, partitions: Int) = {
     possiblePathsParallel(modulo, partitions)
       .map(pure.F.toChordSeq(modulo))
       .filter(pure.F.isCanonical(modulo.toInt) _)
