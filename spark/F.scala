@@ -72,11 +72,7 @@ object F {
 
   def shuffleN(modulo: Int)(nodeSeq: Seq[Int], n: Int, seed: Int) = {
     Random.setSeed(seed)
-    Iterator
-      .continually(seed)
-      .take(n)
-      .zipWithIndex
-      .map(_._2)
+    (0 until n)
       .map { i =>
         Record(
           seed,
