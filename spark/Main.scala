@@ -33,6 +33,7 @@ object Main {
         .withColumn("git_author_date", F.lit(gitAuthorDate))
         .withColumn("git_is_dirty", F.lit(gitIsDirty))
 
+    val sharedPath = "/data/ramsey/spark"
     def log(logEnd: Boolean) =
       logDf
         .withColumn("run_id", F.lit(runId))
@@ -43,7 +44,7 @@ object Main {
         .partitionBy(
           "storage_version"
         )
-        .save("/data/ramsey/spark/run_log")
+        .save(s"$sharedPath/run_log")
 
     log(logEnd = false)
 
@@ -56,7 +57,7 @@ object Main {
     df.write
       .mode("append")
       .partitionBy("storage_version", "modulo", "run_id")
-      .save(s"/data/ramsey/spark/hamiltonian_chord_sequences/")
+      .save(s"$sharedPath/hamiltonian_chord_sequences/")
 
     log(logEnd = true)
 
