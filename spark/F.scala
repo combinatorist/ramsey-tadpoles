@@ -1,4 +1,5 @@
 package pure
+import scala.util.Random
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -58,8 +59,32 @@ object F {
       // .take(modulo) //safety against infite loops (depending what's fed in)
       .exists(lessThanSeq(_, chordSeq))
 
-}
+  def toCanonical(modulo: Int)(chordSeq: Seq[Int]) =
+    Iterator
+      .continually(chordSeq)
+      .flatten
+      .sliding(modulo)
+      .takeWhile(_ != chordSeq)
+      // .take(modulo) //safety against infite loops (depending what's fed in)
+      .reduce((a, b) => if (lessThanSeq(a, b)) a else b)
 
+  def shuffleN(modulo: Int)(nodeSeq: Seq[Int], n: Int, seed: Int) = {
+    Random.setSeed(seed)
+    Iterator
+      .continually(seed)
+      .take(n)
+      .zipWithIndex
+      .map(_._2)
+      .map { i =>
+        Record(
+          seed,
+          i,
+          toCanonical(modulo)(toChordSeq(modulo)(Random.shuffle(nodeSeq)))
+        )
+      }
+  }
+}
+final case class Record(partitionSeed: Int, i: Int, chordSeq: Seq[Int])
 /*
 object SeqOrdering extends Ordering[Seq[Int]] {
   // assumes same length

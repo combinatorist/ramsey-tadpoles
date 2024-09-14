@@ -8,7 +8,8 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     val modulo = args(0).toInt
-    val df = process(modulo)
+    val mainSeed = args.lift(1).fold(0)(_.toInt)
+    val df = process(modulo, mainSeed)
     df.sparkSession.stop()
   }
 
@@ -20,20 +21,21 @@ object Main {
     ).lazyLines.head
   def gitIsDirty = Process("git status --short").lazyLines.nonEmpty
 
-  def process(modulo: Int): Dataset[Row] = {
+  def process(modulo: Int, mainSeed: Int): Dataset[Row] = {
     val runId = UUID.randomUUID().toString
     val spark = session()
     import spark.sqlContext.implicits._
     val logDf =
       List(runId)
         .toDF()
-        .withColumn("storage_version", F.lit("v3.0"))
+        .withColumn("storage_version", F.lit("v4.0"))
+        .withColumn("mainSeed", F.lit(mainSeed))
         .withColumn("git_branch", F.lit(gitBranch))
         .withColumn("git_sha", F.lit(gitSha))
         .withColumn("git_author_date", F.lit(gitAuthorDate))
         .withColumn("git_is_dirty", F.lit(gitIsDirty))
 
-    val sharedPath = "/data/ramsey/spark"
+    val sharedPath = "/data/ramsey/spark/random_sample"
     def log(logEnd: Boolean) =
       logDf
         .withColumn("run_id", F.lit(runId))
@@ -49,14 +51,14 @@ object Main {
     log(logEnd = false)
 
     val df =
-      WithSpark(spark, modulo).fromScratch
+      WithSpark(spark, modulo, mainSeed).fromScratch
         .withColumn("modulo", F.lit(modulo))
-        .withColumn("storage_version", F.lit("v3.0"))
+        .withColumn("storage_version", F.lit("v4.0"))
         .withColumn("run_id", F.lit(runId))
 
     df.write
       .mode("append")
-      .partitionBy("storage_version", "modulo", "run_id")
+      .partitionBy("storage_version", "partitionSeed", "modulo", "run_id")
       .save(s"$sharedPath/hamiltonian_chord_sequences/")
 
     log(logEnd = true)
@@ -65,20 +67,18 @@ object Main {
   }
 }
 
-final case class WithSpark(spark: SparkSession, modulo: Int) {
-  val partitions = modulo - 1
+final case class WithSpark(spark: SparkSession, modulo: Int, mainSeed: Int) {
+  val partitions = 15
   import spark.implicits._
 
-  def possiblePathsParallel =
+  def fromScratch =
     spark
       .range(partitions)
-      .map(_.toInt + 1) // no 0 -> 0 self loop
       .repartition(partitions)
-      .mapPartitions(pure.F.possiblePaths(modulo))
-
-  def fromScratch =
-    possiblePathsParallel
-      .map(pure.F.toChordSeq(modulo))
-      .filter(pure.F.isCanonical(modulo.toInt) _)
+      .mapPartitions(
+        _.flatMap(i =>
+          pure.F.shuffleN(modulo)(Range(0, modulo), 1, mainSeed + i.toInt)
+        )
+      )
 
 }
