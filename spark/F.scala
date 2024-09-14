@@ -78,7 +78,11 @@ object F {
         Record(
           seed,
           i,
-          toCanonical(modulo)(toChordSeq(modulo)(Random.shuffle(nodeSeq)))
+          {
+            val shuffled = Random.shuffle(nodeSeq)
+            val chordSeq = toChordSeq(modulo)(shuffled :+ shuffled.head)
+            toCanonical(modulo)(chordSeq)
+           }
         )
       }
   }
