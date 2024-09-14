@@ -58,8 +58,32 @@ object Main {
   }
 }
 
+final case class MidSequencingLinearish(sequenced: Seq[Int], toSequence: Seq[Int]) {
+  def parallelPartition = {
+    val befores = toSequence.inits.drop(1)
+    val afters = toSequence.tails.drop(1).toList.reverse
+    val sans = befores.zip(afters).map(x => x._1 ++ x._2)
+    toSequence
+      .zip(sans)
+      .map{ case(x, others) =>
+        MidSequencingLinearish(sequenced :+ x, others)
+    }
+  }
+
+}
+
+final case class MidSequencingSimple(sequenced: Seq[Int], toSequence: Set[Int]) {
+  def iterate =
+    toSequence
+      .map(x => MidSequencingSimple(sequenced :+ x, toSequence - x))
+      .filter(x => pure.F.possiblyCanonical(x.sequenced))
+  val toContinue = toSequence.size > 10
+  val run: Set[MidSequencingSimple] =
+    if(toContinue) iterate.flatMap(_.run) else Set(this)
+}
+
 final case class WithSpark(spark: SparkSession, modulo: Int) {
-  val partitions = modulo - 1
+  val partitions = 15
   import spark.implicits._
 
   def possiblePathsParallel = spark

@@ -1,4 +1,5 @@
 package pure
+import scala.math.ceil
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -24,6 +25,13 @@ object Main {
 }
 
 object F {
+  val maxComputeThreads = 16 - 1 // for main node
+  def pickPartitionCount(modulo: Int) = {
+    // ignoring 0 node (will be implied, so not a starting point)
+    val factor = ceil((modulo - 1.0) / maxComputeThreads)
+    val threads = ceil(maxComputeThreads / factor)
+    threads.toInt
+  }
   def otherNodes(modulo: Int): IndexedSeq[Int] = Range(1, modulo).map(_.toInt)
 
   case class Partition(i: Int, of: Int) {
