@@ -9,8 +9,17 @@ object Main {
     assert(F.lessThanSeq(Seq(1,2,3), Seq(2,3,1)))
     assert(!F.lessThanSeq(Seq(1,2,3), Seq(1,2,3)))
     assert(!F.lessThanSeq(Seq(2,3,1), Seq(1,2,3)))
+
     assert(!F.isCanonical(modulo)(Seq(2,3,1)))
     assert(F.isCanonical(modulo)(Seq(1,2,3)))
+
+    // only full Canonical should catch the wrap-around case
+    assert(!F.isCanonical(modulo)(Seq(1,2,1)))
+    assert( F.possiblyCanonical(  Seq(1,2,1)))
+
+    // otherwise, possibly should match
+    assert(!F.possiblyCanonical(Seq(2,3,1)))
+    assert(F.possiblyCanonical(Seq(1,2,3)))
   }
 }
 
@@ -53,6 +62,12 @@ object F {
     .takeWhile(_ != chordSeq)
     //.take(modulo) //safety against infite loops (depending what's fed in)
     .exists(lessThanSeq(_, chordSeq))
+
+  def possiblyCanonical(chordPartSeq: Seq[Long]) =
+    !chordPartSeq
+      .tails
+      .drop(1) // don't start with the current chordPartSeq!
+      .exists(x => lessThanSeq(x, chordPartSeq.take(x.size)))
 
 }
 
