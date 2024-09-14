@@ -29,7 +29,8 @@ object Main {
     val logDf =
       List(runId)
         .toDF()
-        .withColumn("storage_version", F.lit("v4.0"))
+        .withColumn("storage_version", F.lit("v5.0"))
+        .withColumn("modulo", F.lit(modulo))
         .withColumn("mainSeed", F.lit(mainSeed))
         .withColumn("git_branch", F.lit(gitBranch))
         .withColumn("git_sha", F.lit(gitSha))
