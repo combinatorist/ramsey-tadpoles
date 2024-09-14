@@ -78,7 +78,7 @@ final case class WithSpark(spark: SparkSession, modulo: Int, mainSeed: Int) {
       .repartition(partitions)
       .mapPartitions(
         _.flatMap(i =>
-          pure.F.shuffleN(modulo)(pure.F.factorial(2), mainSeed + i.toInt)
+          pure.F.shuffleN(modulo)(pure.F.factorial(modulo - 1), mainSeed + i.toInt)
         )
       )
 
