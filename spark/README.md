@@ -24,6 +24,7 @@ However, I was not able to start spark-shell when I came back to this repo in 20
 So, it is likely out of date with the schema changes I made in 2024.
 
 # todo:
+- skip first node (assume it is 0) in random sampling (like before)
 - consider the fact that it stopped working at modulo 16 and there are only 16 cores
 - fix spark-shell/Summarize.sc
 - unskew partitions (rotate cycle after setting it)
