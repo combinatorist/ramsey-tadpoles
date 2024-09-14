@@ -43,7 +43,7 @@ object Main {
 
     log(logEnd=false)
 
-    val df = WithSpark(spark).fromScratch(modulo, modulo.toInt - 1)
+    val df = WithSpark(spark, modulo).fromScratch
       .withColumn("modulo", F.lit(modulo))
       .withColumn("storage_version", F.lit("v3.0"))
       .withColumn("run_id", F.lit(runId))
@@ -58,17 +58,18 @@ object Main {
   }
 }
 
-case class WithSpark(spark: SparkSession) {
+final case class WithSpark(spark: SparkSession, modulo: Int) {
+  val partitions = modulo - 1
   import spark.implicits._
 
-  def possiblePathsParallel(modulo: Int, partitions: Int) = spark
+  def possiblePathsParallel = spark
     .range(partitions)
-    .map(_.toInt + 1) //no 0 -> 0 self loop
+    .map(_.toInt + 1) // no 0 -> 0 self loop
     .repartition(partitions)
     .mapPartitions(pure.F.possiblePaths(modulo))
 
-  def fromScratch(modulo: Int, partitions: Int) = {
-    possiblePathsParallel(modulo, partitions)
+  def fromScratch = {
+    possiblePathsParallel
       .map(pure.F.toChordSeq(modulo))
       .filter(pure.F.isCanonical(modulo.toInt) _)
   }
