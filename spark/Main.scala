@@ -1,6 +1,7 @@
 import org.apache.spark.sql.{SparkSession, Dataset, Row, functions => F}
 import scala.sys.process._
 import java.util.UUID
+import util.Random
 
 object Main {
   def session() =
@@ -8,7 +9,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     val modulo = args(0).toInt
-    val mainSeed = args.lift(1).fold(0)(_.toInt)
+    val mainSeed = args.lift(1).fold(Random.nextInt())(_.toInt)
     val df = process(modulo, mainSeed)
     df.sparkSession.stop()
   }
