@@ -25,7 +25,6 @@ So, it is likely out of date with the schema changes I made in 2024.
 
 # todo:
 - consider the fact that it stopped working at modulo 16 and there are only 16 cores
-- attempt random sampling to try to get examples of all possible sets
 - fix spark-shell/Summarize.sc
 - unskew partitions (rotate cycle after setting it)
   - but consider rotating in the input to permutations instead
