@@ -22,3 +22,6 @@ jitwatch.out
 # spark-shell
 derby.log
 metastore_db/
+
+# test runs of F.scala
+.scala-build
