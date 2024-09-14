@@ -24,24 +24,20 @@ object Main {
     val spark = session()
     import spark.sqlContext.implicits._
     val logDf = List(runId).toDF()
-      .withColumn("storage_version", F.lit("v2.0"))
+      .withColumn("storage_version", F.lit("v3.0"))
       .withColumn("git_branch", F.lit(gitBranch))
       .withColumn("git_sha", F.lit(gitSha))
       .withColumn("git_author_date", F.lit(gitAuthorDate))
       .withColumn("git_is_dirty", F.lit(gitIsDirty))
 
     def log(logEnd: Boolean) = logDf
+      .withColumn("run_id", F.lit(runId))
       .withColumn("log_type", F.lit(if (logEnd) "end" else "start"))
       .withColumn("log_time", F.current_timestamp())
       .write
       .mode("append")
       .partitionBy(
         "storage_version",
-        "log_time",
-        "git_branch",
-        "git_sha",
-        "git_author_date",
-        "git_is_dirty"
       )
       .save("/data/ramsey/spark/run_log")
 
