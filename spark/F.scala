@@ -17,6 +17,11 @@ object Main {
 }
 
 object F {
+  def factorial(n: Int): Int = n match {
+    case 1 => 1
+    case x => x * factorial(x - 1)
+  }
+
   def otherNodes(modulo: Int): IndexedSeq[Int] = Range(1, modulo).map(_.toInt)
 
   case class Partition(i: Int, of: Int) {
