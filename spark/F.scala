@@ -12,6 +12,7 @@ object Main {
     assert(!F.lessThanSeq(Seq(2, 3, 1), Seq(1, 2, 3)))
     assert(!F.isCanonical(modulo)(Seq(2, 3, 1)))
     assert(F.isCanonical(modulo)(Seq(1, 2, 3)))
+    assert(F.toCanonical(modulo)(Seq(2, 3, 1)) == Seq(1, 2, 3))
   }
 }
 
@@ -64,9 +65,11 @@ object F {
       .continually(chordSeq)
       .flatten
       .sliding(modulo)
+      .drop(1)
       .takeWhile(_ != chordSeq)
       // .take(modulo) //safety against infite loops (depending what's fed in)
-      .reduce((a, b) => if (lessThanSeq(a, b)) a else b)
+      .fold(chordSeq)((a, b) => if (lessThanSeq(a, b)) a else b)
+   }
 
   def shuffleN(modulo: Int)(nodeSeq: Seq[Int], n: Int, seed: Int) = {
     Random.setSeed(seed)
