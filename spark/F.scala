@@ -13,6 +13,8 @@ object Main {
     assert(!F.isCanonical(modulo)(Seq(2, 3, 1)))
     assert(F.isCanonical(modulo)(Seq(1, 2, 3)))
     assert(F.toCanonical(modulo)(Seq(2, 3, 1)) == Seq(1, 2, 3))
+    assert(F.factorial(1) == 1)
+    assert(F.factorial(3) == 6)
   }
 }
 
