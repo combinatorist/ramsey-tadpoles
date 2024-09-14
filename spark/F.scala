@@ -6,11 +6,11 @@ object Main {
     val nodeSeq = Seq(0,1,2,0).map(_.toLong)
     val chordSeq = F.toChordSeq(modulo)(nodeSeq)
     assert(chordSeq == Seq(1,1,1))
-    assert(F.lessThanSeq(Seq(0,1,2), Seq(1,2,0)))
-    assert(!F.lessThanSeq(Seq(0,1,2), Seq(0,1,2)))
-    assert(!F.lessThanSeq(Seq(1,2,0), Seq(0,1,2)))
-    assert(!F.isCanonical(modulo)(Seq(1,2,0)))
-    assert(F.isCanonical(modulo)(Seq(0,1,2)))
+    assert(F.lessThanSeq(Seq(1,2,3), Seq(2,3,1)))
+    assert(!F.lessThanSeq(Seq(1,2,3), Seq(1,2,3)))
+    assert(!F.lessThanSeq(Seq(2,3,1), Seq(1,2,3)))
+    assert(!F.isCanonical(modulo)(Seq(2,3,1)))
+    assert(F.isCanonical(modulo)(Seq(1,2,3)))
   }
 }
 
@@ -43,7 +43,7 @@ object F {
   def lessThanSeq(a: Seq[Long], b: Seq[Long]) = a.lazyZip(b)
     .dropWhile(x => x._1 == x._2)
     .headOption
-    .exists{ case(c: Long,d: Long) => c < d}
+    .exists{ case(c: Long, d: Long) => c < d}
 
   def isCanonical(modulo: Int)(chordSeq: Seq[Long]) = !Iterator
     .continually(chordSeq)
