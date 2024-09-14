@@ -70,8 +70,9 @@ object F {
       // .take(modulo) //safety against infite loops (depending what's fed in)
       .fold(chordSeq)((a, b) => if (lessThanSeq(a, b)) a else b)
 
-  def shuffleN(modulo: Int)(nodeSeq: Seq[Int], n: Int, seed: Int) = {
+  def shuffleN(modulo: Int)(n: Int, seed: Int) = {
     Random.setSeed(seed)
+    val nodeSeq = Range(0, modulo)
     (0 until n)
       .map { i =>
         Record(
