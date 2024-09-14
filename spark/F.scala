@@ -69,7 +69,6 @@ object F {
       .takeWhile(_ != chordSeq)
       // .take(modulo) //safety against infite loops (depending what's fed in)
       .fold(chordSeq)((a, b) => if (lessThanSeq(a, b)) a else b)
-   }
 
   def shuffleN(modulo: Int)(nodeSeq: Seq[Int], n: Int, seed: Int) = {
     Random.setSeed(seed)
