@@ -71,7 +71,7 @@ object Main {
 
 final case class WithSpark(spark: SparkSession, modulo: Int, mainSeed: Int) {
   val partitions = 15
-  val N = pure.F.factorial(1)
+  val N = pure.F.factorial(10)
   import spark.implicits._
 
   def fromScratch =
