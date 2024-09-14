@@ -24,5 +24,6 @@ However, I was not able to start spark-shell when I came back to this repo in 20
 So, it is likely out of date with the schema changes I made in 2024.
 
 # todo:
+- fix spark-shell/Summarize.sc
 - unskew partitions (rotate cycle after setting it)
   - but consider rotating in the input to permutations instead
