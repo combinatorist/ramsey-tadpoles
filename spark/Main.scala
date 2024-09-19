@@ -71,7 +71,7 @@ object Main {
 
 final case class WithSpark(spark: SparkSession, modulo: Int, mainSeed: Int) {
   val threads = 15
-  val rounds = 1024
+  val rounds = 1
   val partitions = threads * rounds
   val N = pure.F.factorial(9)
   import spark.implicits._
