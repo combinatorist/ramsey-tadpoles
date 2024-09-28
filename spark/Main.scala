@@ -29,7 +29,7 @@ object Main {
     val logDf =
       List(runId)
         .toDF()
-        .withColumn("storage_version", F.lit("v5.0"))
+        .withColumn("storage_version", F.lit("v5.1"))
         .withColumn("modulo", F.lit(modulo))
         .withColumn("mainSeed", F.lit(mainSeed))
         .withColumn("git_branch", F.lit(gitBranch))
@@ -55,7 +55,7 @@ object Main {
     val df =
       WithSpark(spark, modulo, mainSeed).fromScratch
         .withColumn("modulo", F.lit(modulo))
-        .withColumn("storage_version", F.lit("v4.0"))
+        .withColumn("storage_version", F.lit("v4.1"))
         .withColumn("run_id", F.lit(runId))
 
     df.write
