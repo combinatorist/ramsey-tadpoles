@@ -29,7 +29,6 @@ object Main {
     val logDf =
       List(runId)
         .toDF()
-        .withColumn("storage_version", F.lit("v5.1"))
         .withColumn("modulo", F.lit(modulo))
         .withColumn("mainSeed", F.lit(mainSeed))
         .withColumn("git_branch", F.lit(gitBranch))
@@ -45,10 +44,7 @@ object Main {
         .withColumn("log_time", F.current_timestamp())
         .write
         .mode("append")
-        .partitionBy(
-          "storage_version"
-        )
-        .save(s"$sharedPath/run_log")
+        .save(s"$sharedPath/run_log/storage_version=6.0")
 
     log(logEnd = false)
 
@@ -60,8 +56,8 @@ object Main {
 
     df.write
       .mode("append")
-      .partitionBy("storage_version", "partitionSeed", "modulo", "run_id")
-      .save(s"$sharedPath/hamiltonian_chord_sequences/")
+      .partitionBy("partitionSeed", "modulo", "run_id")
+      .save(s"$sharedPath/hamiltonian_chord_sequences/storage_version=6.0")
 
     log(logEnd = true)
 
