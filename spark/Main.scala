@@ -56,7 +56,7 @@ object Main {
 
     df.write
       .mode("append")
-      .partitionBy("partitionSeed", "modulo", "run_id")
+      .partitionBy("modulo", "run_id", "partitionSeed")
       .save(s"$sharedPath/hamiltonian_chord_sequences/storage_version=6.0")
 
     log(logEnd = true)
