@@ -29,6 +29,7 @@ object Main {
     val logDf =
       List(runId)
         .toDF()
+        .withColumn("storage_version", F.lit("v5.0"))
         .withColumn("modulo", F.lit(modulo))
         .withColumn("mainSeed", F.lit(mainSeed))
         .withColumn("git_branch", F.lit(gitBranch))
@@ -44,20 +45,23 @@ object Main {
         .withColumn("log_time", F.current_timestamp())
         .write
         .mode("append")
-        .save(s"$sharedPath/run_log/storage_version=6.0")
+        .partitionBy(
+          "storage_version"
+        )
+        .save(s"$sharedPath/run_log")
 
     log(logEnd = false)
 
     val df =
       WithSpark(spark, modulo, mainSeed).fromScratch
         .withColumn("modulo", F.lit(modulo))
-        .withColumn("storage_version", F.lit("v4.1"))
+        .withColumn("storage_version", F.lit("v4.0"))
         .withColumn("run_id", F.lit(runId))
 
     df.write
       .mode("append")
-      .partitionBy("modulo", "run_id", "partitionSeed")
-      .save(s"$sharedPath/hamiltonian_chord_sequences/storage_version=6.0")
+      .partitionBy("storage_version", "partitionSeed", "modulo", "run_id")
+      .save(s"$sharedPath/hamiltonian_chord_sequences/")
 
     log(logEnd = true)
 
